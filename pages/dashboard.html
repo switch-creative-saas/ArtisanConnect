@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard - ArtisanConnect</title>
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -18,37 +20,17 @@
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
   <!-- Dashboard Top Header -->
-  <div class="dashboard-topbar" id="dashboardTopbar">
+  <div class="dashboard-topbar">
     <div class="dashboard-topbar-left">
-      <div class="logo" style="gap:10px;">
-        <div class="logo-icon">AC</div>
+      <a href="dashboard.html" class="logo" style="gap:10px; text-decoration:none;">
+        <div class="logo-icon"><img src="../assets/app-logo.png" alt="ArtisanConnect"></div>
         <span class="topbar-title">ArtisanConnect</span>
-      </div>
+      </a>
     </div>
-    <div class="dashboard-topbar-right">
-      <button class="topbar-menu-btn" id="topbarMenuBtn" aria-label="Open menu" type="button">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="3" y1="12" x2="21" y2="12"></line>
-          <line x1="3" y1="6" x2="21" y2="6"></line>
-          <line x1="3" y1="18" x2="21" y2="18"></line>
-        </svg>
-      </button>
-      <div class="topbar-menu" id="topbarMenu" style="display:none;">
-        <a class="topbar-menu-item" href="../index.html">Home</a>
-      </div>
-    </div>
+    <div class="dashboard-topbar-right"></div>
   </div>
 
   <div class="dashboard">
-    <!-- Sidebar Toggle Button (Mobile) -->
-    <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="3" y1="12" x2="21" y2="12"></line>
-        <line x1="3" y1="6" x2="21" y2="6"></line>
-        <line x1="3" y1="18" x2="21" y2="18"></line>
-      </svg>
-    </button>
-
     <!-- Dashboard Sidebar -->
     <aside class="dashboard-sidebar" id="dashboardSidebar">
       <div class="sidebar-profile">
@@ -448,84 +430,5 @@
 
   <script src="../js/main.js"></script>
   <script src="../js/dashboard.js"></script>
-  <script>
-    (function () {
-      const btn = document.getElementById('topbarMenuBtn');
-      const menu = document.getElementById('topbarMenu');
-      if (!btn || !menu) return;
-
-      function close() {
-        menu.style.display = 'none';
-        btn.setAttribute('aria-expanded', 'false');
-      }
-
-      btn.addEventListener('click', () => {
-        const isOpen = menu.style.display === 'block';
-        menu.style.display = isOpen ? 'none' : 'block';
-        btn.setAttribute('aria-expanded', String(!isOpen));
-      });
-
-      document.addEventListener('click', (e) => {
-        if (e.target.closest('#topbarMenuBtn') || e.target.closest('#topbarMenu')) return;
-        close();
-      });
-
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') close();
-      });
-    })();
-  </script>
-  <style>
-    .dashboard-topbar{
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      height: 72px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding: 0 var(--space-xl);
-      background: rgba(15, 23, 42, 0.55);
-      backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-    .dashboard-topbar .topbar-title{font-weight:800;letter-spacing:-0.02em;}
-    .dashboard-topbar-right{position:relative;display:flex;align-items:center;gap:10px;}
-    .topbar-menu-btn{
-      width:44px;height:44px;border-radius:14px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.10);
-      color: var(--text);
-      display:flex;align-items:center;justify-content:center;
-      transition: var(--transition-normal);
-    }
-    .topbar-menu-btn:hover{transform: translateY(-1px);background: rgba(99,102,241,0.16);border-color: rgba(99,102,241,0.25);}
-    .topbar-menu{
-      position:absolute;
-      right:0;
-      top:54px;
-      min-width: 200px;
-      padding: 8px;
-      border-radius: 16px;
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(255,255,255,0.10);
-      backdrop-filter: blur(14px);
-      box-shadow: 0 18px 60px rgba(0,0,0,0.35);
-    }
-    .topbar-menu-item{
-      display:flex;
-      padding: 10px 12px;
-      border-radius: 12px;
-      color: var(--text);
-      text-decoration:none;
-      font-weight:600;
-      background: transparent;
-      transition: var(--transition-normal);
-    }
-    .topbar-menu-item:hover{background: rgba(255,255,255,0.06);}
-    @media (max-width: 768px){
-      .dashboard-topbar{padding: 0 var(--space-lg); height: 66px;}
-    }
-  </style>
 </body>
 </html>

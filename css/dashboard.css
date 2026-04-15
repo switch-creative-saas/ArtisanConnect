@@ -134,6 +134,24 @@
   min-height: 100vh;
 }
 
+@media (max-width: 768px) {
+  .dashboard-main {
+    padding: var(--space-lg);
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-main {
+    padding: var(--space-md);
+  }
+  .dashboard-card-body {
+    padding: var(--space-lg);
+  }
+  .dashboard-card-header {
+    padding: var(--space-lg);
+  }
+}
+
 .dashboard-header {
   display: flex;
   align-items: center;
@@ -540,6 +558,36 @@
 /* ============================================
    RESPONSIVE DASHBOARD
    ============================================ */
+
+/* Dashboard Top Header (shared across dashboard pages) */
+.dashboard-topbar{
+  position: sticky;
+  top: 0;
+  z-index: 180;
+  height: 72px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 0 var(--space-xl);
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.dashboard-topbar .topbar-title{
+  font-weight:800;
+  letter-spacing:-0.02em;
+}
+
+.dashboard-topbar-right{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+@media (max-width: 768px){
+  .dashboard-topbar{padding: 0 var(--space-lg); height: 66px;}
+}
 
 @media (max-width: 1200px) {
   .stats-grid {

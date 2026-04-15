@@ -59,6 +59,9 @@ function initSidebarReveal() {
   };
 
   zone.addEventListener('mouseenter', open);
+  // Mobile/touch: allow tap/click on the edge zone to open
+  zone.addEventListener('click', open);
+  zone.addEventListener('touchstart', open, { passive: true });
   sidebar.addEventListener('mouseenter', () => {
     if (closeTimer) clearTimeout(closeTimer);
   });

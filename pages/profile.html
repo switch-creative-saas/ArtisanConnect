@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Profile - ArtisanConnect</title>
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -13,16 +15,17 @@
 <body>
   <div class="toast-container" id="toastContainer"></div>
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+  <div class="dashboard-topbar">
+    <div class="dashboard-topbar-left">
+      <a href="dashboard.html" class="logo" style="gap:10px; text-decoration:none;">
+        <div class="logo-icon"><img src="../assets/app-logo.png" alt="ArtisanConnect"></div>
+        <span class="topbar-title">ArtisanConnect</span>
+      </a>
+    </div>
+    <div class="dashboard-topbar-right"></div>
+  </div>
 
   <div class="dashboard">
-    <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" aria-label="Open menu">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="3" y1="12" x2="21" y2="12"></line>
-        <line x1="3" y1="6" x2="21" y2="6"></line>
-        <line x1="3" y1="18" x2="21" y2="18"></line>
-      </svg>
-    </button>
-
     <aside class="dashboard-sidebar" id="dashboardSidebar">
       <div class="sidebar-profile">
         <div class="sidebar-user">
@@ -79,7 +82,27 @@
           <h3 class="dashboard-card-title">Personal Information</h3>
         </div>
         <div class="dashboard-card-body">
-          <form onsubmit="event.preventDefault(); showToast('Profile saved', 'success');">
+          <form id="profileForm" onsubmit="event.preventDefault();">
+            <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:14px;">
+              <img id="profileAvatarPreview" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&h=120&fit=crop" alt="Profile photo" style="width:72px;height:72px;border-radius:50%;border:2px solid var(--primary);object-fit:cover;">
+              <div style="display:flex;flex-direction:column;gap:10px;min-width:min(520px,100%);flex:1;">
+                <div class="input-group" style="margin:0;">
+                  <label>Profile photo URL (optional)</label>
+                  <input id="profileAvatarUrl" type="url" placeholder="https://..." autocomplete="url">
+                </div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                  <label class="btn btn-secondary" style="cursor:pointer;">
+                    Upload photo
+                    <input id="profileAvatarFile" type="file" accept="image/*" style="display:none;">
+                  </label>
+                  <button class="btn btn-ghost" type="button" id="removeAvatarBtn">Remove photo</button>
+                </div>
+                <div style="color:var(--text-secondary);font-size:.85rem;line-height:1.4;">
+                  Tip: Upload is saved locally (demo). URL also works.
+                </div>
+              </div>
+            </div>
+
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
               <div class="input-group">
                 <label>First name</label>
@@ -118,9 +141,67 @@
       if (nameEl) nameEl.textContent = `${user.firstName || 'User'} ${user.lastName || ''}`.trim();
       const av = document.getElementById('sidebarAvatar');
       if (av && user.avatar) av.src = user.avatar;
+
+      const preview = document.getElementById('profileAvatarPreview');
+      const urlInput = document.getElementById('profileAvatarUrl');
+      const fileInput = document.getElementById('profileAvatarFile');
+      const removeBtn = document.getElementById('removeAvatarBtn');
+      const form = document.getElementById('profileForm');
+
+      const defaultAvatar = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&h=120&fit=crop';
+      let pendingAvatar = user.avatar || defaultAvatar;
+
+      function setAvatar(src) {
+        pendingAvatar = src || defaultAvatar;
+        if (preview) preview.src = pendingAvatar;
+        if (av) av.src = pendingAvatar;
+      }
+
+      setAvatar(user.avatar || defaultAvatar);
+      if (urlInput) urlInput.value = user.avatar || '';
+
+      urlInput?.addEventListener('input', () => {
+        const v = urlInput.value.trim();
+        if (!v) return;
+        setAvatar(v);
+      });
+
+      fileInput?.addEventListener('change', async () => {
+        const file = fileInput.files?.[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+          showToast('Please select an image file', 'warning');
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => setAvatar(String(reader.result || ''));
+        reader.readAsDataURL(file);
+      });
+
+      removeBtn?.addEventListener('click', () => {
+        if (urlInput) urlInput.value = '';
+        if (fileInput) fileInput.value = '';
+        setAvatar(defaultAvatar);
+      });
+
       document.getElementById('profileFirstName').value = user.firstName || '';
       document.getElementById('profileLastName').value = user.lastName || '';
       document.getElementById('profileEmail').value = user.email || '';
+
+      form?.addEventListener('submit', () => {
+        const updated = {
+          ...user,
+          firstName: document.getElementById('profileFirstName')?.value?.trim() || user.firstName,
+          lastName: document.getElementById('profileLastName')?.value?.trim() || user.lastName,
+          email: document.getElementById('profileEmail')?.value?.trim() || user.email,
+          phone: document.getElementById('profilePhone')?.value?.trim() || user.phone,
+          avatar: pendingAvatar
+        };
+        try {
+          localStorage.setItem('user', JSON.stringify(updated));
+        } catch (e) {}
+        showToast('Profile saved', 'success');
+      });
     });
   </script>
 </body>
