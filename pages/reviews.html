@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reviews & Ratings - ArtisanConnect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/reviews.css">
+</head>
+<body>
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+  <div class="dashboard">
+    <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" aria-label="Open menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+
+    <aside class="dashboard-sidebar" id="dashboardSidebar">
+      <div class="sidebar-profile">
+        <div class="sidebar-user">
+          <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop" alt="User" class="sidebar-user-avatar">
+          <div class="sidebar-user-info">
+            <h4 id="sidebarUserName">John Doe</h4>
+            <p>Client</p>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="sidebar-nav-section">
+          <p class="sidebar-nav-title">Main</p>
+          <ul class="sidebar-nav-list">
+            <li class="sidebar-nav-item"><a href="../index.html" class="sidebar-nav-link">Landing Page</a></li>
+            <li class="sidebar-nav-item"><a href="dashboard.html" class="sidebar-nav-link">Dashboard</a></li>
+            <li class="sidebar-nav-item"><a href="search.html" class="sidebar-nav-link">Find Artisans</a></li>
+            <li class="sidebar-nav-item"><a href="messages.html" class="sidebar-nav-link">Messages</a></li>
+            <li class="sidebar-nav-item"><a href="favourites.html" class="sidebar-nav-link">Favourites</a></li>
+          </ul>
+        </div>
+        <div class="sidebar-nav-section">
+          <p class="sidebar-nav-title">Orders</p>
+          <ul class="sidebar-nav-list">
+            <li class="sidebar-nav-item"><a href="orders.html" class="sidebar-nav-link">My Orders</a></li>
+            <li class="sidebar-nav-item"><a href="track-order.html" class="sidebar-nav-link">Track Order</a></li>
+            <li class="sidebar-nav-item"><a href="order-history.html" class="sidebar-nav-link">Order History</a></li>
+          </ul>
+        </div>
+        <div class="sidebar-nav-section">
+          <p class="sidebar-nav-title">Account</p>
+          <ul class="sidebar-nav-list">
+            <li class="sidebar-nav-item"><a href="profile.html" class="sidebar-nav-link">Profile</a></li>
+            <li class="sidebar-nav-item"><a href="settings.html" class="sidebar-nav-link">Settings</a></li>
+            <li class="sidebar-nav-item"><a href="#" class="sidebar-nav-link" onclick="logout(); return false;">Logout (to Landing)</a></li>
+          </ul>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="dashboard-main">
+      <!-- Reviews Page -->
+      <div class="reviews-page">
+        <div class="reviews-container">
+      <div class="reviews-header">
+        <h1 class="reviews-title">Reviews & Ratings</h1>
+        <p class="reviews-subtitle">See what others are saying about our artisans</p>
+      </div>
+      
+      <!-- Rating Summary -->
+      <div class="rating-summary">
+        <div class="rating-summary-grid">
+          <div class="rating-overall">
+            <div class="rating-overall-score">4.8</div>
+            <div class="rating-overall-stars">
+              <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+            </div>
+            <div class="rating-overall-count">Based on 1,247 reviews</div>
+          </div>
+          
+          <div class="rating-breakdown">
+            <div class="rating-breakdown-item">
+              <span class="rating-breakdown-label">
+                <span>★</span> 5
+              </span>
+              <div class="rating-breakdown-bar">
+                <div class="rating-breakdown-fill" style="width: 75%;"></div>
+              </div>
+              <span class="rating-breakdown-count">936</span>
+            </div>
+            <div class="rating-breakdown-item">
+              <span class="rating-breakdown-label">
+                <span>★</span> 4
+              </span>
+              <div class="rating-breakdown-bar">
+                <div class="rating-breakdown-fill" style="width: 18%;"></div>
+              </div>
+              <span class="rating-breakdown-count">224</span>
+            </div>
+            <div class="rating-breakdown-item">
+              <span class="rating-breakdown-label">
+                <span>★</span> 3
+              </span>
+              <div class="rating-breakdown-bar">
+                <div class="rating-breakdown-fill" style="width: 5%;"></div>
+              </div>
+              <span class="rating-breakdown-count">62</span>
+            </div>
+            <div class="rating-breakdown-item">
+              <span class="rating-breakdown-label">
+                <span>★</span> 2
+              </span>
+              <div class="rating-breakdown-bar">
+                <div class="rating-breakdown-fill" style="width: 1.5%;"></div>
+              </div>
+              <span class="rating-breakdown-count">18</span>
+            </div>
+            <div class="rating-breakdown-item">
+              <span class="rating-breakdown-label">
+                <span>★</span> 1
+              </span>
+              <div class="rating-breakdown-bar">
+                <div class="rating-breakdown-fill" style="width: 0.5%;"></div>
+              </div>
+              <span class="rating-breakdown-count">7</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Write a Review -->
+      <div class="review-form-card">
+        <h3 class="review-form-title">Write a Review</h3>
+        <form class="review-form" onsubmit="submitReview(event)">
+          <div class="rating-input">
+            <span class="rating-input-label">Your Rating</span>
+            <div class="rating-input-stars" id="ratingStars">
+              <span class="rating-input-star" data-rating="1" onclick="setRating(1)">★</span>
+              <span class="rating-input-star" data-rating="2" onclick="setRating(2)">★</span>
+              <span class="rating-input-star" data-rating="3" onclick="setRating(3)">★</span>
+              <span class="rating-input-star" data-rating="4" onclick="setRating(4)">★</span>
+              <span class="rating-input-star" data-rating="5" onclick="setRating(5)">★</span>
+            </div>
+          </div>
+          
+          <textarea class="review-textarea" id="reviewText" placeholder="Share your experience with this artisan..." required></textarea>
+          
+          <div class="review-form-actions">
+            <button type="submit" class="review-submit-btn">Submit Review</button>
+          </div>
+        </form>
+      </div>
+      
+      <!-- Reviews List -->
+      <div class="reviews-list">
+        <div class="reviews-filter">
+          <p class="reviews-count">Showing <span>6</span> of <span>1,247</span> reviews</p>
+          <div class="reviews-sort">
+            <span class="sort-label">Sort by:</span>
+            <select class="sort-select" id="reviewSort" onchange="sortReviews()">
+              <option value="newest">Newest First</option>
+              <option value="highest">Highest Rated</option>
+              <option value="lowest">Lowest Rated</option>
+              <option value="helpful">Most Helpful</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Review Cards -->
+        <div class="review-card">
+          <div class="review-card-header">
+            <div class="review-author">
+              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop" alt="Emily Davis" class="review-author-avatar">
+              <div class="review-author-info">
+                <h4>Emily Davis</h4>
+                <p>Verified Customer</p>
+              </div>
+            </div>
+            <div class="review-rating">
+              <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+            </div>
+          </div>
+          <span class="review-date">January 10, 2024</span>
+          <p class="review-content">
+            David was absolutely fantastic! He arrived on time, diagnosed the electrical issue quickly, and had it fixed within an hour. Very professional and explained everything clearly. Would definitely hire again!
+          </p>
+          <span class="review-service">Service: Electrical Repair</span>
+          <div class="review-actions">
+            <button class="review-action-btn" onclick="toggleHelpful(this)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+              </svg>
+              Helpful (24)
+            </button>
+            <button class="review-action-btn" onclick="showToast('Report submitted', 'info')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                <line x1="4" y1="22" x2="4" y2="15"></line>
+              </svg>
+              Report
+            </button>
+          </div>
+        </div>
+        
+        <div class="review-card">
+          <div class="review-card-header">
+            <div class="review-author">
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop" alt="Michael Brown" class="review-author-avatar">
+              <div class="review-author-info">
+                <h4>Michael Brown</h4>
+                <p>Verified Customer</p>
+              </div>
+            </div>
+            <div class="review-rating">
+              <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+            </div>
+          </div>
+          <span class="review-date">January 8, 2024</span>
+          <p class="review-content">
+            Excellent service! David installed new lighting fixtures in my home and did an amazing job. Clean work, fair pricing, and very courteous. Highly recommend for any electrical work.
+          </p>
+          <span class="review-service">Service: Lighting Installation</span>
+          <div class="review-actions">
+            <button class="review-action-btn" onclick="toggleHelpful(this)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+              </svg>
+              Helpful (18)
+            </button>
+            <button class="review-action-btn" onclick="showToast('Report submitted', 'info')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                <line x1="4" y1="22" x2="4" y2="15"></line>
+              </svg>
+              Report
+            </button>
+          </div>
+        </div>
+        
+        <div class="review-card">
+          <div class="review-card-header">
+            <div class="review-author">
+              <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop" alt="Sarah Wilson" class="review-author-avatar">
+              <div class="review-author-info">
+                <h4>Sarah Wilson</h4>
+                <p>Verified Customer</p>
+              </div>
+            </div>
+            <div class="review-rating">
+              <span>★</span><span>★</span><span>★</span><span>★</span><span>☆</span>
+            </div>
+          </div>
+          <span class="review-date">January 5, 2024</span>
+          <p class="review-content">
+            Good service overall. David was knowledgeable and fixed the issue. Only giving 4 stars because he arrived about 15 minutes late, but he did communicate about the delay. Work quality was excellent.
+          </p>
+          <span class="review-service">Service: Outlet Repair</span>
+          <div class="review-actions">
+            <button class="review-action-btn" onclick="toggleHelpful(this)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+              </svg>
+              Helpful (12)
+            </button>
+            <button class="review-action-btn" onclick="showToast('Report submitted', 'info')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                <line x1="4" y1="22" x2="4" y2="15"></line>
+              </svg>
+              Report
+            </button>
+          </div>
+        </div>
+        
+        <div class="review-card">
+          <div class="review-card-header">
+            <div class="review-author">
+              <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop" alt="James Miller" class="review-author-avatar">
+              <div class="review-author-info">
+                <h4>James Miller</h4>
+                <p>Verified Customer</p>
+              </div>
+            </div>
+            <div class="review-rating">
+              <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+            </div>
+          </div>
+          <span class="review-date">January 2, 2024</span>
+          <p class="review-content">
+            David is my go-to electrician now! He's done multiple projects at my home including panel upgrades, new circuits, and smart home installations. Always professional, always fair pricing.
+          </p>
+          <span class="review-service">Service: Panel Upgrade</span>
+          <div class="review-actions">
+            <button class="review-action-btn" onclick="toggleHelpful(this)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+              </svg>
+              Helpful (31)
+            </button>
+            <button class="review-action-btn" onclick="showToast('Report submitted', 'info')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                <line x1="4" y1="22" x2="4" y2="15"></line>
+              </svg>
+              Report
+            </button>
+          </div>
+        </div>
+        
+        <div class="review-card">
+          <div class="review-card-header">
+            <div class="review-author">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop" alt="Lisa Anderson" class="review-author-avatar">
+              <div class="review-author-info">
+                <h4>Lisa Anderson</h4>
+                <p>Verified Customer</p>
+              </div>
+            </div>
+            <div class="review-rating">
+              <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+            </div>
+          </div>
+          <span class="review-date">December 28, 2023</span>
+          <p class="review-content">
+            Fantastic experience! David helped us with a complete rewiring of our older home. He was patient, explained everything, and the work was done beautifully. Our house is now much safer thanks to him.
+          </p>
+          <span class="review-service">Service: Home Rewiring</span>
+          <div class="review-actions">
+            <button class="review-action-btn" onclick="toggleHelpful(this)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+              </svg>
+              Helpful (27)
+            </button>
+            <button class="review-action-btn" onclick="showToast('Report submitted', 'info')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                <line x1="4" y1="22" x2="4" y2="15"></line>
+              </svg>
+              Report
+            </button>
+          </div>
+        </div>
+        
+        <div class="review-card">
+          <div class="review-card-header">
+            <div class="review-author">
+              <img src="https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=100&h=100&fit=crop" alt="Tom Wilson" class="review-author-avatar">
+              <div class="review-author-info">
+                <h4>Tom Wilson</h4>
+                <p>Verified Customer</p>
+              </div>
+            </div>
+            <div class="review-rating">
+              <span>★</span><span>★</span><span>★</span><span>★</span><span>☆</span>
+            </div>
+          </div>
+          <span class="review-date">December 22, 2023</span>
+          <p class="review-content">
+            Solid work. David installed a ceiling fan and some outdoor lighting for us. Everything works great. Would have given 5 stars but the cleanup could have been a bit better. Still recommend though!
+          </p>
+          <span class="review-service">Service: Ceiling Fan Installation</span>
+          <div class="review-actions">
+            <button class="review-action-btn" onclick="toggleHelpful(this)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+              </svg>
+              Helpful (9)
+            </button>
+            <button class="review-action-btn" onclick="showToast('Report submitted', 'info')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                <line x1="4" y1="22" x2="4" y2="15"></line>
+              </svg>
+              Report
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Pagination -->
+      <div class="reviews-pagination">
+        <button class="pagination-btn" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m15 18-6-6 6-6"></path>
+          </svg>
+        </button>
+        <button class="pagination-btn active">1</button>
+        <button class="pagination-btn">2</button>
+        <button class="pagination-btn">3</button>
+        <button class="pagination-btn">...</button>
+        <button class="pagination-btn">208</button>
+        <button class="pagination-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m9 18 6-6-6-6"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+    </main>
+  </div>
+
+  <script src="../js/main.js"></script>
+  <script src="../js/dashboard.js"></script>
+  <script src="../js/reviews.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+      const nameEl = document.getElementById('sidebarUserName');
+      if (user && nameEl) nameEl.textContent = `${user.firstName || 'User'} ${user.lastName || ''}`.trim();
+    });
+  </script>
+</body>
+</html>

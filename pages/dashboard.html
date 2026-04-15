@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - ArtisanConnect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Sidebar Overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+  <!-- Dashboard Top Header -->
+  <div class="dashboard-topbar" id="dashboardTopbar">
+    <div class="dashboard-topbar-left">
+      <div class="logo" style="gap:10px;">
+        <div class="logo-icon">AC</div>
+        <span class="topbar-title">ArtisanConnect</span>
+      </div>
+    </div>
+    <div class="dashboard-topbar-right">
+      <button class="topbar-menu-btn" id="topbarMenuBtn" aria-label="Open menu" type="button">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+      <div class="topbar-menu" id="topbarMenu" style="display:none;">
+        <a class="topbar-menu-item" href="../index.html">Home</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard">
+    <!-- Sidebar Toggle Button (Mobile) -->
+    <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+
+    <!-- Dashboard Sidebar -->
+    <aside class="dashboard-sidebar" id="dashboardSidebar">
+      <div class="sidebar-profile">
+        <div class="sidebar-user">
+          <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop" alt="John Doe" class="sidebar-user-avatar">
+          <div class="sidebar-user-info">
+            <h4>John Doe</h4>
+            <p>Client</p>
+          </div>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <div class="sidebar-nav-section">
+          <p class="sidebar-nav-title">Main</p>
+          <ul class="sidebar-nav-list">
+            <li class="sidebar-nav-item">
+              <a href="dashboard.html" class="sidebar-nav-link active">
+                <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="14" width="7" height="7"></rect>
+                  <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                Dashboard
+              </a>
+            </li>
+            <li class="sidebar-nav-item">
+              <a href="search.html" class="sidebar-nav-link">
+                <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.3-4.3"></path>
+                </svg>
+                Find Artisans
+              </a>
+            </li>
+            <li class="sidebar-nav-item">
+              <a href="messages.html" class="sidebar-nav-link">
+                <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                Messages
+                <span class="sidebar-nav-badge">3</span>
+              </a>
+            </li>
+            <li class="sidebar-nav-item">
+              <a href="favourites.html" class="sidebar-nav-link">
+                <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+                Favourites
+              </a>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="sidebar-nav-section">
+          <p class="sidebar-nav-title">Orders</p>
+          <ul class="sidebar-nav-list">
+            <li class="sidebar-nav-item">
+              <a href="orders.html" class="sidebar-nav-link">
+                <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                  <path d="M3 6h18"></path>
+                  <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
+                My Orders
+              </a>
+            </li>
+            <li class="sidebar-nav-item">
+              <a href="track-order.html" class="sidebar-nav-link">
+                <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+                Track Order
+              </a>
+            </li>
+            <li class="sidebar-nav-item">
+              <a href="order-history.html" class="sidebar-nav-link">
+                <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                Order History
+              </a>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="sidebar-nav-section">
+          <p class="sidebar-nav-title">Account</p>
+          <ul class="sidebar-nav-list">
+            <li class="sidebar-nav-item">
+              <a href="profile.html" class="sidebar-nav-link">
+                <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                Profile
+              </a>
+            </li>
+            <li class="sidebar-nav-item">
+              <a href="settings.html" class="sidebar-nav-link">
+                <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                Settings
+              </a>
+            </li>
+            <li class="sidebar-nav-item">
+              <a href="#" class="sidebar-nav-link" onclick="logout(); return false;">
+                <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Logout (to Landing)
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Dashboard Main Content -->
+    <main class="dashboard-main">
+      <div class="dashboard-header">
+        <div class="dashboard-title">
+          <h1>Welcome back, John! 👋</h1>
+          <p>Here's what's happening with your projects</p>
+        </div>
+        <div class="dashboard-actions">
+          <a href="search.html" class="btn btn-primary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.3-4.3"></path>
+            </svg>
+            Find Artisan
+          </a>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon primary">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                <path d="M3 6h18"></path>
+                <path d="M16 10a4 4 0 0 1-8 0"></path>
+              </svg>
+            </div>
+            <div class="stat-trend up">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                <polyline points="17 6 23 6 23 12"></polyline>
+              </svg>
+              +12%
+            </div>
+          </div>
+          <div class="stat-value">12</div>
+          <div class="stat-label">Total Orders</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon success">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+            </div>
+            <div class="stat-trend up">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                <polyline points="17 6 23 6 23 12"></polyline>
+              </svg>
+              +8%
+            </div>
+          </div>
+          <div class="stat-value">8</div>
+          <div class="stat-label">Completed</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon warning">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </div>
+            <div class="stat-trend down">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
+                <polyline points="17 18 23 18 23 12"></polyline>
+              </svg>
+              -2
+            </div>
+          </div>
+          <div class="stat-value">3</div>
+          <div class="stat-label">In Progress</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon error">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </div>
+            <div class="stat-trend up">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                <polyline points="17 6 23 6 23 12"></polyline>
+              </svg>
+              +5
+            </div>
+          </div>
+          <div class="stat-value">5</div>
+          <div class="stat-label">New Messages</div>
+        </div>
+      </div>
+
+      <!-- Dashboard Grid -->
+      <div class="dashboard-grid">
+        <!-- Recent Orders -->
+        <div class="dashboard-card">
+          <div class="dashboard-card-header">
+            <h3 class="dashboard-card-title">Recent Orders</h3>
+            <a href="orders.html" class="dashboard-card-action">View All</a>
+          </div>
+          <div class="dashboard-card-body">
+            <table class="orders-table">
+              <thead>
+                <tr>
+                  <th>Artisan</th>
+                  <th>Service</th>
+                  <th>Status</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="order-artisan">
+                      <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop" alt="David Chen" class="order-artisan-avatar">
+                      <span class="order-artisan-name">David Chen</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="order-service">Electrical Repair</div>
+                  </td>
+                  <td>
+                    <span class="order-status in-progress">In Progress</span>
+                  </td>
+                  <td class="order-amount">₦150,000</td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="order-artisan">
+                      <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop" alt="Sarah Johnson" class="order-artisan-avatar">
+                      <span class="order-artisan-name">Sarah Johnson</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="order-service">Plumbing Fix</div>
+                  </td>
+                  <td>
+                    <span class="order-status pending">Pending</span>
+                  </td>
+                  <td class="order-amount">₦85,000</td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="order-artisan">
+                      <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop" alt="Robert Williams" class="order-artisan-avatar">
+                      <span class="order-artisan-name">Robert Williams</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="order-service">Furniture Assembly</div>
+                  </td>
+                  <td>
+                    <span class="order-status completed">Completed</span>
+                  </td>
+                  <td class="order-amount">₦120,000</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="dashboard-card">
+          <div class="dashboard-card-header">
+            <h3 class="dashboard-card-title">Recent Activity</h3>
+          <a href="order-history.html" class="dashboard-card-action">View All</a>
+          </div>
+          <div class="dashboard-card-body">
+            <div class="activity-list">
+              <div class="activity-item">
+                <div class="activity-icon request">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                  </svg>
+                </div>
+                <div class="activity-content">
+                  <div class="activity-title">New service request sent</div>
+                  <div class="activity-meta">To David Chen - Electrical Repair</div>
+                </div>
+                <div class="activity-time">2h ago</div>
+              </div>
+              
+              <div class="activity-item">
+                <div class="activity-icon completed">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                  </svg>
+                </div>
+                <div class="activity-content">
+                  <div class="activity-title">Order completed</div>
+                  <div class="activity-meta">Robert Williams - Furniture Assembly</div>
+                </div>
+                <div class="activity-time">1d ago</div>
+              </div>
+              
+              <div class="activity-item">
+                <div class="activity-icon review">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  </svg>
+                </div>
+                <div class="activity-content">
+                  <div class="activity-title">Left a review</div>
+                  <div class="activity-meta">5 stars for Robert Williams</div>
+                </div>
+                <div class="activity-time">1d ago</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recommended Artisans -->
+      <div class="dashboard-card" style="margin-top: var(--space-xl);">
+        <div class="dashboard-card-header">
+          <h3 class="dashboard-card-title">Recommended For You</h3>
+          <a href="search.html" class="dashboard-card-action">View All</a>
+        </div>
+        <div class="dashboard-card-body">
+          <div class="recommended-list">
+            <div class="recommended-item">
+              <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop" alt="James Miller" class="recommended-avatar">
+              <div class="recommended-info">
+                <div class="recommended-name">James Miller</div>
+                <div class="recommended-service">HVAC Technician</div>
+              </div>
+              <div class="recommended-rating">
+                <span>★</span> 4.9
+              </div>
+              <button class="recommended-btn" data-auth="hire" data-artisan-id="6" data-artisan-name="James Miller">Hire</button>
+            </div>
+            
+            <div class="recommended-item">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop" alt="Maria Garcia" class="recommended-avatar">
+              <div class="recommended-info">
+                <div class="recommended-name">Maria Garcia</div>
+                <div class="recommended-service">Painter</div>
+              </div>
+              <div class="recommended-rating">
+                <span>★</span> 4.8
+              </div>
+              <button class="recommended-btn" data-auth="hire" data-artisan-id="7" data-artisan-name="Maria Garcia">Hire</button>
+            </div>
+            
+            <div class="recommended-item">
+              <img src="https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=100&h=100&fit=crop" alt="Tom Wilson" class="recommended-avatar">
+              <div class="recommended-info">
+                <div class="recommended-name">Tom Wilson</div>
+                <div class="recommended-service">Gardener</div>
+              </div>
+              <div class="recommended-rating">
+                <span>★</span> 4.7
+              </div>
+              <button class="recommended-btn" data-auth="hire" data-artisan-id="8" data-artisan-name="Tom Wilson">Hire</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/main.js"></script>
+  <script src="../js/dashboard.js"></script>
+  <script>
+    (function () {
+      const btn = document.getElementById('topbarMenuBtn');
+      const menu = document.getElementById('topbarMenu');
+      if (!btn || !menu) return;
+
+      function close() {
+        menu.style.display = 'none';
+        btn.setAttribute('aria-expanded', 'false');
+      }
+
+      btn.addEventListener('click', () => {
+        const isOpen = menu.style.display === 'block';
+        menu.style.display = isOpen ? 'none' : 'block';
+        btn.setAttribute('aria-expanded', String(!isOpen));
+      });
+
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('#topbarMenuBtn') || e.target.closest('#topbarMenu')) return;
+        close();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') close();
+      });
+    })();
+  </script>
+  <style>
+    .dashboard-topbar{
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: 72px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 0 var(--space-xl);
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .dashboard-topbar .topbar-title{font-weight:800;letter-spacing:-0.02em;}
+    .dashboard-topbar-right{position:relative;display:flex;align-items:center;gap:10px;}
+    .topbar-menu-btn{
+      width:44px;height:44px;border-radius:14px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.10);
+      color: var(--text);
+      display:flex;align-items:center;justify-content:center;
+      transition: var(--transition-normal);
+    }
+    .topbar-menu-btn:hover{transform: translateY(-1px);background: rgba(99,102,241,0.16);border-color: rgba(99,102,241,0.25);}
+    .topbar-menu{
+      position:absolute;
+      right:0;
+      top:54px;
+      min-width: 200px;
+      padding: 8px;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255,255,255,0.10);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 18px 60px rgba(0,0,0,0.35);
+    }
+    .topbar-menu-item{
+      display:flex;
+      padding: 10px 12px;
+      border-radius: 12px;
+      color: var(--text);
+      text-decoration:none;
+      font-weight:600;
+      background: transparent;
+      transition: var(--transition-normal);
+    }
+    .topbar-menu-item:hover{background: rgba(255,255,255,0.06);}
+    @media (max-width: 768px){
+      .dashboard-topbar{padding: 0 var(--space-lg); height: 66px;}
+    }
+  </style>
+</body>
+</html>

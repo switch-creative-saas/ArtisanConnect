@@ -1,0 +1,206 @@
+.hire-page {
+  min-height: 100vh;
+  padding: 96px 16px 40px;
+}
+
+.hire-container {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.hire-card {
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 20px;
+}
+
+.hire-header {
+  margin-bottom: 16px;
+}
+
+.hire-title {
+  font-size: 1.5rem;
+  margin-bottom: 6px;
+}
+
+.hire-subtitle {
+  color: var(--text-secondary);
+}
+
+.step-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  color: var(--primary-light);
+  background: rgba(99, 102, 241, 0.14);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.artisan-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 10px 0 20px;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.artisan-summary img {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+}
+
+.artisan-summary h4 {
+  margin: 0 0 2px;
+}
+
+.artisan-summary p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.hire-form .input-group {
+  margin-bottom: 14px;
+}
+
+.hire-form label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.hire-form input,
+.hire-form textarea,
+.hire-form select {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text);
+}
+
+.hire-form textarea {
+  min-height: 130px;
+  resize: vertical;
+}
+
+.hire-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.hire-nav {
+  margin-top: 18px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.hire-arrow-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(15, 23, 42, 0.45);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.hire-arrow-btn.primary {
+  background: var(--gradient-primary);
+  border-color: transparent;
+  color: #fff;
+}
+
+.summary-list {
+  display: grid;
+  gap: 10px;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.12);
+}
+
+.summary-item.total {
+  border-bottom: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.pay-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin: 6px 0 12px;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+
+.pay-section {
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pay-section-title {
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.pay-transfer-card {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(30, 41, 59, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pay-transfer-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--text-secondary);
+}
+
+.pay-transfer-row strong {
+  color: var(--text);
+}
+
+.pay-hint {
+  margin: 10px 0 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 768px) {
+  .hire-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}

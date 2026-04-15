@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Favourites - ArtisanConnect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+  <div class="toast-container" id="toastContainer"></div>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+  <div class="dashboard">
+    <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" aria-label="Open menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+
+    <aside class="dashboard-sidebar" id="dashboardSidebar">
+      <div class="sidebar-profile">
+        <div class="sidebar-user">
+          <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop" alt="User" class="sidebar-user-avatar">
+          <div class="sidebar-user-info">
+            <h4 id="sidebarUserName">John Doe</h4>
+            <p>Client</p>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="sidebar-nav-section">
+          <p class="sidebar-nav-title">Main</p>
+          <ul class="sidebar-nav-list">
+            <li class="sidebar-nav-item"><a href="../index.html" class="sidebar-nav-link">Landing Page</a></li>
+            <li class="sidebar-nav-item"><a href="dashboard.html" class="sidebar-nav-link">Dashboard</a></li>
+            <li class="sidebar-nav-item"><a href="search.html" class="sidebar-nav-link">Find Artisans</a></li>
+            <li class="sidebar-nav-item"><a href="messages.html" class="sidebar-nav-link">Messages</a></li>
+            <li class="sidebar-nav-item"><a href="favourites.html" class="sidebar-nav-link active">Favourites</a></li>
+          </ul>
+        </div>
+
+        <div class="sidebar-nav-section">
+          <p class="sidebar-nav-title">Orders</p>
+          <ul class="sidebar-nav-list">
+            <li class="sidebar-nav-item"><a href="orders.html" class="sidebar-nav-link">My Orders</a></li>
+            <li class="sidebar-nav-item"><a href="track-order.html" class="sidebar-nav-link">Track Order</a></li>
+            <li class="sidebar-nav-item"><a href="order-history.html" class="sidebar-nav-link">Order History</a></li>
+          </ul>
+        </div>
+
+        <div class="sidebar-nav-section">
+          <p class="sidebar-nav-title">Account</p>
+          <ul class="sidebar-nav-list">
+            <li class="sidebar-nav-item"><a href="profile.html" class="sidebar-nav-link">Profile</a></li>
+            <li class="sidebar-nav-item"><a href="settings.html" class="sidebar-nav-link">Settings</a></li>
+            <li class="sidebar-nav-item"><a href="#" class="sidebar-nav-link" onclick="logout(); return false;">Logout (to Landing)</a></li>
+          </ul>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="dashboard-main">
+      <div class="dashboard-header">
+        <div class="dashboard-title">
+          <h1>Favourites</h1>
+          <p>Saved artisans you can hire anytime</p>
+        </div>
+        <div class="dashboard-actions">
+          <a href="search.html" class="btn btn-primary">Browse more</a>
+        </div>
+      </div>
+
+      <div class="dashboard-card">
+        <div class="dashboard-card-header">
+          <h3 class="dashboard-card-title">Saved Artisans</h3>
+          <a href="search.html" class="dashboard-card-action">Find More</a>
+        </div>
+        <div class="dashboard-card-body">
+          <div class="recommended-list">
+            <div class="recommended-item">
+              <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop" alt="James Miller" class="recommended-avatar">
+              <div class="recommended-info">
+                <div class="recommended-name">James Miller</div>
+                <div class="recommended-service">HVAC Technician</div>
+              </div>
+              <div class="recommended-rating"><span>★</span> 4.9</div>
+              <button class="recommended-btn" data-auth="hire" data-artisan-id="6" data-artisan-name="James Miller">Hire</button>
+            </div>
+
+            <div class="recommended-item">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop" alt="Maria Garcia" class="recommended-avatar">
+              <div class="recommended-info">
+                <div class="recommended-name">Maria Garcia</div>
+                <div class="recommended-service">Painter</div>
+              </div>
+              <div class="recommended-rating"><span>★</span> 4.8</div>
+              <button class="recommended-btn" data-auth="hire" data-artisan-id="7" data-artisan-name="Maria Garcia">Hire</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/main.js"></script>
+  <script src="../js/dashboard.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = getCurrentUser?.();
+      if (user) {
+        const el = document.getElementById('sidebarUserName');
+        if (el) el.textContent = `${user.firstName || 'User'} ${user.lastName || ''}`.trim();
+      }
+    });
+  </script>
+</body>
+</html>

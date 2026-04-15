@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Find Artisans - ArtisanConnect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/search.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Public Header (ONLY when NOT logged in) -->
+  <div id="publicShell">
+    <nav class="navbar scrolled" id="navbar">
+      <div class="navbar-container">
+        <a href="../index.html" class="logo">
+          <div class="logo-icon">AC</div>
+          ArtisanConnect
+        </a>
+        
+        <ul class="nav-links">
+          <li><a href="../index.html">Home</a></li>
+          <li><a href="search.html" class="active">Find Artisans</a></li>
+          <li><a href="how-it-works.html">How It Works</a></li>
+          <li><a href="about.html">About</a></li>
+        </ul>
+        
+        <div class="nav-actions"></div>
+        
+        <button class="menu-toggle" id="menuToggle" aria-label="Open menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Search Page (Public) -->
+    <div class="search-page" id="searchContent">
+    <!-- Search Header -->
+    <div class="search-header">
+      <div class="search-container">
+        <div class="search-bar">
+          <div class="search-input-wrapper">
+            <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.3-4.3"></path>
+            </svg>
+            <input type="text" placeholder="Search for a service or artisan..." id="searchInput" oninput="filterArtisans()">
+          </div>
+          <div class="search-location-wrapper">
+            <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <input type="text" placeholder="Location" id="locationInput" oninput="filterArtisans()">
+            <button class="use-location-btn" type="button" onclick="useMyLocation()" aria-label="Use my location">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a8 8 0 0 0 .1-6"></path>
+                <path d="M4.5 9a8 8 0 0 0 0 6"></path>
+                <path d="M12 2v2"></path>
+                <path d="M12 20v2"></path>
+                <path d="M2 12h2"></path>
+                <path d="M20 12h2"></path>
+              </svg>
+            </button>
+          </div>
+          <button class="search-btn" onclick="filterArtisans()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.3-4.3"></path>
+            </svg>
+            Search
+          </button>
+        </div>
+        
+        <div class="filter-bar">
+          <div class="filter-group">
+            <span class="filter-label">Category:</span>
+            <select class="filter-select" id="categoryFilter" onchange="filterArtisans()">
+              <option value="">All Categories</option>
+              <option value="plumbing">Plumbing</option>
+              <option value="electrical">Electrical</option>
+              <option value="carpentry">Carpentry</option>
+              <option value="painting">Painting</option>
+              <option value="cleaning">Cleaning</option>
+              <option value="gardening">Gardening</option>
+              <option value="hvac">HVAC</option>
+              <option value="tailoring">Tailoring</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <span class="filter-label">Rating:</span>
+            <select class="filter-select" id="ratingFilter" onchange="filterArtisans()">
+              <option value="">Any Rating</option>
+              <option value="4.5">4.5+ stars</option>
+              <option value="4.0">4.0+ stars</option>
+              <option value="3.5">3.5+ stars</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <span class="filter-label">Price:</span>
+            <select class="filter-select" id="priceFilter" onchange="filterArtisans()">
+              <option value="">Any Price</option>
+              <option value="0-30">₦0 - ₦30k/hr</option>
+              <option value="30-50">₦30k - ₦50k/hr</option>
+              <option value="50-100">₦50k - ₦100k/hr</option>
+              <option value="100+">₦100k+/hr</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <span class="filter-label">Distance:</span>
+            <select class="filter-select" id="distanceFilter" onchange="filterArtisans()">
+              <option value="">Any Distance</option>
+              <option value="1">Within 1 mile</option>
+              <option value="5">Within 5 miles</option>
+              <option value="10">Within 10 miles</option>
+              <option value="25">Within 25 miles</option>
+            </select>
+          </div>
+          
+          <button class="clear-filters" onclick="clearFilters()">Clear Filters</button>
+        </div>
+        
+        <div class="filter-chips" id="filterChips"></div>
+      </div>
+    </div>
+
+    <!-- Search Results -->
+    <div class="search-results">
+      <div class="search-container">
+        <div class="results-header">
+          <p class="results-count">Showing <span id="resultsCount">8</span> artisans</p>
+          <div class="results-sort">
+            <span class="sort-label">Sort by:</span>
+            <select class="sort-select" id="sortSelect" onchange="sortArtisans()">
+              <option value="relevance">Relevance</option>
+              <option value="rating">Highest Rated</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="distance">Nearest</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="results-grid" id="resultsGrid">
+          <!-- Artisan cards will be dynamically generated -->
+        </div>
+        
+        <!-- No Results State -->
+        <div class="no-results" id="noResults" style="display: none;">
+          <div class="no-results-icon">🔍</div>
+          <h3 class="no-results-title">No artisans found</h3>
+          <p class="no-results-text">Try adjusting your filters or search for a different service</p>
+          <button class="btn btn-primary" onclick="clearFilters()">Clear Filters</button>
+        </div>
+        
+        <!-- Pagination -->
+        <div class="pagination" id="pagination">
+          <button class="pagination-btn" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m15 18-6-6 6-6"></path>
+            </svg>
+          </button>
+          <button class="pagination-btn active">1</button>
+          <button class="pagination-btn">2</button>
+          <button class="pagination-btn">3</button>
+          <button class="pagination-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m9 18 6-6-6-6"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- Dashboard Shell (ONLY when logged in). No top header/navbar. -->
+  <div id="dashboardShell" style="display:none;">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="dashboard">
+      <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" aria-label="Open menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <aside class="dashboard-sidebar" id="dashboardSidebar">
+        <div class="sidebar-profile">
+          <div class="sidebar-user">
+            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop" alt="User" class="sidebar-user-avatar">
+            <div class="sidebar-user-info">
+              <h4 id="sidebarUserName">John Doe</h4>
+              <p>Client</p>
+            </div>
+          </div>
+        </div>
+
+        <nav class="sidebar-nav">
+          <div class="sidebar-nav-section">
+            <p class="sidebar-nav-title">Main</p>
+            <ul class="sidebar-nav-list">
+              <li class="sidebar-nav-item"><a href="../index.html" class="sidebar-nav-link">Landing Page</a></li>
+              <li class="sidebar-nav-item"><a href="dashboard.html" class="sidebar-nav-link">Dashboard</a></li>
+              <li class="sidebar-nav-item"><a href="search.html" class="sidebar-nav-link active">Find Artisans</a></li>
+              <li class="sidebar-nav-item"><a href="messages.html" class="sidebar-nav-link">Messages</a></li>
+              <li class="sidebar-nav-item"><a href="favourites.html" class="sidebar-nav-link">Favourites</a></li>
+            </ul>
+          </div>
+
+          <div class="sidebar-nav-section">
+            <p class="sidebar-nav-title">Orders</p>
+            <ul class="sidebar-nav-list">
+              <li class="sidebar-nav-item"><a href="orders.html" class="sidebar-nav-link">My Orders</a></li>
+              <li class="sidebar-nav-item"><a href="track-order.html" class="sidebar-nav-link">Track Order</a></li>
+              <li class="sidebar-nav-item"><a href="order-history.html" class="sidebar-nav-link">Order History</a></li>
+            </ul>
+          </div>
+
+          <div class="sidebar-nav-section">
+            <p class="sidebar-nav-title">Account</p>
+            <ul class="sidebar-nav-list">
+              <li class="sidebar-nav-item"><a href="profile.html" class="sidebar-nav-link">Profile</a></li>
+              <li class="sidebar-nav-item"><a href="settings.html" class="sidebar-nav-link">Settings</a></li>
+              <li class="sidebar-nav-item"><a href="#" class="sidebar-nav-link" onclick="logout(); return false;">Logout (to Landing)</a></li>
+            </ul>
+          </div>
+        </nav>
+      </aside>
+
+      <main class="dashboard-main" id="dashboardMain"></main>
+    </div>
+  </div>
+
+  <script src="../js/main.js"></script>
+  <script src="../js/dashboard.js"></script>
+  <script src="../js/search.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const forcePublic = urlParams.get('public') === 'true';
+      const loggedIn = !forcePublic && typeof isLoggedIn === 'function' && isLoggedIn();
+      const publicShell = document.getElementById('publicShell');
+      const dashboardShell = document.getElementById('dashboardShell');
+      const searchContent = document.getElementById('searchContent');
+      const dashMain = document.getElementById('dashboardMain');
+
+      if (loggedIn) {
+        if (publicShell) publicShell.style.display = 'none';
+        if (dashboardShell) dashboardShell.style.display = 'block';
+        if (dashMain && searchContent) dashMain.appendChild(searchContent);
+
+        const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+        const nameEl = document.getElementById('sidebarUserName');
+        if (user && nameEl) nameEl.textContent = `${user.firstName || 'User'} ${user.lastName || ''}`.trim();
+      } else {
+        if (publicShell) publicShell.style.display = 'block';
+        if (dashboardShell) dashboardShell.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

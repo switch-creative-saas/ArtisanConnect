@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment - ArtisanConnect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/payment.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+  <div class="dashboard">
+    <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" aria-label="Open menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+
+    <aside class="dashboard-sidebar" id="dashboardSidebar">
+      <div class="sidebar-profile">
+        <div class="sidebar-user">
+          <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop" alt="User" class="sidebar-user-avatar">
+          <div class="sidebar-user-info">
+            <h4 id="sidebarUserName">John Doe</h4>
+            <p>Client</p>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="sidebar-nav-section">
+          <p class="sidebar-nav-title">Main</p>
+          <ul class="sidebar-nav-list">
+            <li class="sidebar-nav-item"><a href="../index.html" class="sidebar-nav-link">Landing Page</a></li>
+            <li class="sidebar-nav-item"><a href="dashboard.html" class="sidebar-nav-link">Dashboard</a></li>
+            <li class="sidebar-nav-item"><a href="search.html" class="sidebar-nav-link">Find Artisans</a></li>
+            <li class="sidebar-nav-item"><a href="messages.html" class="sidebar-nav-link">Messages</a></li>
+            <li class="sidebar-nav-item"><a href="favourites.html" class="sidebar-nav-link">Favourites</a></li>
+          </ul>
+        </div>
+        <div class="sidebar-nav-section">
+          <p class="sidebar-nav-title">Orders</p>
+          <ul class="sidebar-nav-list">
+            <li class="sidebar-nav-item"><a href="orders.html" class="sidebar-nav-link">My Orders</a></li>
+            <li class="sidebar-nav-item"><a href="track-order.html" class="sidebar-nav-link">Track Order</a></li>
+            <li class="sidebar-nav-item"><a href="order-history.html" class="sidebar-nav-link">Order History</a></li>
+          </ul>
+        </div>
+        <div class="sidebar-nav-section">
+          <p class="sidebar-nav-title">Account</p>
+          <ul class="sidebar-nav-list">
+            <li class="sidebar-nav-item"><a href="profile.html" class="sidebar-nav-link">Profile</a></li>
+            <li class="sidebar-nav-item"><a href="settings.html" class="sidebar-nav-link">Settings</a></li>
+            <li class="sidebar-nav-item"><a href="#" class="sidebar-nav-link" onclick="logout(); return false;">Logout (to Landing)</a></li>
+          </ul>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="dashboard-main">
+      <!-- Payment Page -->
+      <div class="payment-page">
+        <div class="payment-container">
+      <div class="payment-header">
+        <h1 class="payment-title">Complete Your Payment</h1>
+        <p class="payment-subtitle">Secure payment for your service</p>
+      </div>
+      
+      <div class="payment-grid" id="paymentForm">
+        <!-- Order Summary -->
+        <div class="order-summary">
+          <div class="order-summary-header">
+            <h3 class="order-summary-title">Order Summary</h3>
+          </div>
+          <div class="order-summary-body">
+            <div class="order-artisan">
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop" alt="Artisan" class="order-artisan-avatar" id="summaryArtisanAvatar">
+              <div class="order-artisan-info">
+                <h4 id="summaryArtisanName">David Chen</h4>
+                <p id="summaryArtisanService">Electrician</p>
+              </div>
+            </div>
+            
+            <div class="order-service">
+              <p class="order-service-label">Service</p>
+              <p class="order-service-value" id="summaryServiceValue">Electrical Repair & Installation</p>
+            </div>
+            
+            <div class="order-details">
+              <div class="order-detail">
+                <span class="order-detail-label">Service Fee</span>
+                <span class="order-detail-value" id="serviceFeeValue">₦120,000</span>
+              </div>
+              <div class="order-detail">
+                <span class="order-detail-label">Materials</span>
+                <span class="order-detail-value" id="materialsFeeValue">₦45,000</span>
+              </div>
+              <div class="order-detail">
+                <span class="order-detail-label" id="platformFeeLabel">Platform Fee</span>
+                <span class="order-detail-value" id="platformFeeValue">₦5,000</span>
+              </div>
+              <div class="order-detail">
+                <span class="order-detail-label" id="taxFeeLabel">Tax (8%)</span>
+                <span class="order-detail-value" id="taxFeeValue">₦13,600</span>
+              </div>
+            </div>
+            
+            <div class="order-total">
+              <span class="order-total-label">Total</span>
+              <span class="order-total-value" id="orderTotalValue">₦183,600</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Payment Methods -->
+        <div class="payment-methods">
+          <div class="payment-methods-header">
+            <h3 class="payment-methods-title">Request Details & Payment</h3>
+          </div>
+          <div class="payment-methods-body">
+            <div class="request-details-card">
+              <h4 class="request-details-title">Describe your needs</h4>
+              <div class="input-group">
+                <label for="jobNeeds">What do you need done?</label>
+                <textarea id="jobNeeds" rows="4" placeholder="Example: Fix my generator that stops after 20 minutes and check wiring." required></textarea>
+              </div>
+              <div class="card-form-row">
+                <div class="input-group">
+                  <label for="hoursInput">Hours</label>
+                  <input type="number" id="hoursInput" min="1" max="24" value="2">
+                </div>
+                <div class="input-group">
+                  <label for="hourlyRateDisplay">Hourly Rate</label>
+                  <input type="text" id="hourlyRateDisplay" readonly>
+                </div>
+                <div class="input-group">
+                  <label for="materialsEstimateInput">Materials Estimate (₦)</label>
+                  <input type="number" id="materialsEstimateInput" min="0" step="1000" value="45000">
+                </div>
+              </div>
+              <div class="card-form-row">
+                <div class="input-group">
+                  <label for="locationAddress">Service Address</label>
+                  <input type="text" id="locationAddress" placeholder="Your street / area">
+                </div>
+              </div>
+              <div class="request-actions">
+                <button class="btn btn-secondary" type="button" id="negotiateBtn">Negotiation / Enquiries</button>
+              </div>
+            </div>
+
+            <div class="payment-method-divider"></div>
+
+            <h4 class="request-details-title">Payment Method</h4>
+            <div class="payment-method-list">
+              <div class="payment-method-item selected" onclick="selectPaymentMethod(this, 'card')">
+                <div class="payment-method-radio">
+                  <span></span>
+                </div>
+                <div class="payment-method-icon">💳</div>
+                <div class="payment-method-info">
+                  <div class="payment-method-name">Credit/Debit Card</div>
+                  <div class="payment-method-desc">Visa, Mastercard, Amex</div>
+                </div>
+              </div>
+              
+              <div class="payment-method-item" onclick="selectPaymentMethod(this, 'paypal')">
+                <div class="payment-method-radio">
+                  <span></span>
+                </div>
+                <div class="payment-method-icon">🅿️</div>
+                <div class="payment-method-info">
+                  <div class="payment-method-name">PayPal</div>
+                  <div class="payment-method-desc">Pay with your PayPal account</div>
+                </div>
+              </div>
+              
+              <div class="payment-method-item" onclick="selectPaymentMethod(this, 'apple')">
+                <div class="payment-method-radio">
+                  <span></span>
+                </div>
+                <div class="payment-method-icon">🍎</div>
+                <div class="payment-method-info">
+                  <div class="payment-method-name">Apple Pay</div>
+                  <div class="payment-method-desc">Fast and secure checkout</div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Card Form -->
+            <div class="card-form active" id="cardForm">
+              <div class="input-group">
+                <label for="cardNumber">Card Number</label>
+                <div class="card-input-wrapper">
+                  <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCardNumber(this)">
+                  <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                    <line x1="2" y1="10" x2="22" y2="10"></line>
+                  </svg>
+                </div>
+                <div class="card-icons">
+                  <div class="card-icon">VISA</div>
+                  <div class="card-icon">MC</div>
+                  <div class="card-icon">AMEX</div>
+                </div>
+              </div>
+              
+              <div class="input-group">
+                <label for="cardName">Cardholder Name</label>
+                <div class="card-input-wrapper">
+                  <input type="text" id="cardName" placeholder="John Doe">
+                </div>
+              </div>
+              
+              <div class="card-form-row">
+                <div class="input-group">
+                  <label for="cardExpiry">Expiry Date</label>
+                  <div class="card-input-wrapper">
+                    <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5" oninput="formatExpiry(this)">
+                  </div>
+                </div>
+                
+                <div class="input-group">
+                  <label for="cardCvv">CVV</label>
+                  <div class="card-input-wrapper">
+                    <input type="text" id="cardCvv" placeholder="123" maxlength="4">
+                    <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Security Info -->
+            <div class="payment-security">
+              <div class="payment-security-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+              </div>
+              <p class="payment-security-text">
+                <strong>Secure Payment</strong>
+                Your payment information is encrypted and secure
+              </p>
+            </div>
+            
+            <!-- Pay Button -->
+            <button class="pay-btn" id="payBtn" onclick="processPayment()">
+              <span id="payBtnText">Pay ₦183,600</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Payment Success -->
+      <div class="payment-success" id="paymentSuccess" style="display: none;">
+        <div class="success-animation">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <h2 class="payment-success-title">Payment Successful!</h2>
+        <p class="payment-success-message">Your payment has been processed successfully. You will receive a confirmation email shortly.</p>
+        
+        <div class="payment-success-details">
+          <div class="payment-success-row">
+            <span class="payment-success-label">Order ID</span>
+            <span class="payment-success-value">#ORD-2024-001234</span>
+          </div>
+          <div class="payment-success-row">
+            <span class="payment-success-label">Amount Paid</span>
+            <span class="payment-success-value" id="successAmountPaid">₦183,600</span>
+          </div>
+          <div class="payment-success-row">
+            <span class="payment-success-label">Payment Method</span>
+            <span class="payment-success-value">Credit Card</span>
+          </div>
+          <div class="payment-success-row">
+            <span class="payment-success-label">Date</span>
+            <span class="payment-success-value" id="paymentDate"></span>
+          </div>
+        </div>
+        
+        <div class="payment-success-actions">
+          <a href="track-order.html" class="btn btn-primary">Track Order</a>
+          <a href="orders.html" class="btn btn-secondary">Go to Orders</a>
+        </div>
+      </div>
+    </div>
+  </div>
+    </main>
+  </div>
+
+  <script src="../js/main.js"></script>
+  <script src="../js/dashboard.js"></script>
+  <script src="../js/payment.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+      const nameEl = document.getElementById('sidebarUserName');
+      if (user && nameEl) nameEl.textContent = `${user.firstName || 'User'} ${user.lastName || ''}`.trim();
+    });
+  </script>
+</body>
+</html>

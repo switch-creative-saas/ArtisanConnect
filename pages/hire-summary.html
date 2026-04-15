@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hire Artisan - Summary</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/hire-flow.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body data-step="summary">
+  <div class="toast-container" id="toastContainer"></div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" aria-label="Open menu">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </button>
+  <aside class="dashboard-sidebar" id="dashboardSidebar">
+    <div class="sidebar-profile">
+      <div class="sidebar-user">
+        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop" alt="User" class="sidebar-user-avatar">
+        <div class="sidebar-user-info">
+          <h4>Menu</h4>
+          <p>Navigation</p>
+        </div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-nav-section">
+        <p class="sidebar-nav-title">Main</p>
+        <ul class="sidebar-nav-list">
+          <li class="sidebar-nav-item"><a class="sidebar-nav-link" href="dashboard.html">Dashboard</a></li>
+          <li class="sidebar-nav-item"><a class="sidebar-nav-link" href="search.html">Find Artisans</a></li>
+          <li class="sidebar-nav-item"><a class="sidebar-nav-link" href="messages.html">Messages</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-nav-section">
+        <p class="sidebar-nav-title">Orders</p>
+        <ul class="sidebar-nav-list">
+          <li class="sidebar-nav-item"><a class="sidebar-nav-link" href="orders.html">My Orders</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-nav-section">
+        <p class="sidebar-nav-title">Account</p>
+        <ul class="sidebar-nav-list">
+          <li class="sidebar-nav-item"><a class="sidebar-nav-link" href="profile.html">Profile</a></li>
+          <li class="sidebar-nav-item"><a class="sidebar-nav-link" href="settings.html">Settings</a></li>
+          <li class="sidebar-nav-item"><a class="sidebar-nav-link" href="#" onclick="logout(); return false;">Logout</a></li>
+        </ul>
+      </div>
+    </nav>
+  </aside>
+  <div class="hire-page">
+    <div class="hire-container">
+      <div class="hire-card">
+        <div class="hire-header">
+          <div class="step-pill">Step 4 of 4 · Final Summary</div>
+          <h1 class="hire-title">Review and checkout</h1>
+          <p class="hire-subtitle">Confirm everything below before placing your order.</p>
+        </div>
+
+        <div class="artisan-summary">
+          <img id="artisanAvatar" alt="Artisan">
+          <div>
+            <h4 id="artisanName"></h4>
+            <p id="artisanService"></p>
+          </div>
+        </div>
+
+        <div class="summary-list">
+          <div class="summary-item"><span>Needs</span><span id="sumNeeds"></span></div>
+          <div class="summary-item"><span>Address</span><span id="sumAddress"></span></div>
+          <div class="summary-item"><span>Hours</span><span id="sumHours"></span></div>
+          <div class="summary-item"><span>Hourly rate</span><span id="sumHourly"></span></div>
+          <div class="summary-item"><span>Service fee</span><span id="sumService"></span></div>
+          <div class="summary-item"><span>Materials</span><span id="sumMaterials"></span></div>
+          <div class="summary-item"><span>Platform fee</span><span id="sumPlatform"></span></div>
+          <div class="summary-item"><span id="sumTaxLabel">Tax</span><span id="sumTax"></span></div>
+          <div class="summary-item total"><span>Total</span><span id="sumTotal"></span></div>
+        </div>
+
+        <div class="hire-nav">
+          <a class="hire-arrow-btn" href="hire-step-3.html">← Previous</a>
+          <button class="hire-arrow-btn primary" id="checkoutBtn" type="button">Checkout →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../js/main.js"></script>
+  <script src="../js/dashboard.js"></script>
+  <script src="../js/hire-flow.js"></script>
+</body>
+</html>

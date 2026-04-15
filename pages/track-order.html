@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Order - ArtisanConnect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/tracking.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+  <div class="toast-container" id="toastContainer"></div>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+  <div class="dashboard">
+    <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" aria-label="Open menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+
+    <aside class="dashboard-sidebar" id="dashboardSidebar">
+      <div class="sidebar-profile">
+        <div class="sidebar-user">
+          <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop" alt="User" class="sidebar-user-avatar">
+          <div class="sidebar-user-info">
+            <h4 id="sidebarUserName">John Doe</h4>
+            <p>Client</p>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="sidebar-nav-section">
+          <p class="sidebar-nav-title">Main</p>
+          <ul class="sidebar-nav-list">
+            <li class="sidebar-nav-item"><a href="../index.html" class="sidebar-nav-link">Landing Page</a></li>
+            <li class="sidebar-nav-item"><a href="dashboard.html" class="sidebar-nav-link">Dashboard</a></li>
+            <li class="sidebar-nav-item"><a href="search.html" class="sidebar-nav-link">Find Artisans</a></li>
+            <li class="sidebar-nav-item"><a href="messages.html" class="sidebar-nav-link">Messages</a></li>
+            <li class="sidebar-nav-item"><a href="favourites.html" class="sidebar-nav-link">Favourites</a></li>
+          </ul>
+        </div>
+        <div class="sidebar-nav-section">
+          <p class="sidebar-nav-title">Orders</p>
+          <ul class="sidebar-nav-list">
+            <li class="sidebar-nav-item"><a href="orders.html" class="sidebar-nav-link">My Orders</a></li>
+            <li class="sidebar-nav-item"><a href="track-order.html" class="sidebar-nav-link active">Track Order</a></li>
+            <li class="sidebar-nav-item"><a href="order-history.html" class="sidebar-nav-link">Order History</a></li>
+          </ul>
+        </div>
+        <div class="sidebar-nav-section">
+          <p class="sidebar-nav-title">Account</p>
+          <ul class="sidebar-nav-list">
+            <li class="sidebar-nav-item"><a href="profile.html" class="sidebar-nav-link">Profile</a></li>
+            <li class="sidebar-nav-item"><a href="settings.html" class="sidebar-nav-link">Settings</a></li>
+            <li class="sidebar-nav-item"><a href="#" class="sidebar-nav-link" onclick="logout(); return false;">Logout (to Landing)</a></li>
+          </ul>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="dashboard-main">
+      <div class="tracking-page">
+        <div class="tracking-container">
+      <div class="tracking-header">
+        <h1 class="tracking-title">Track Your Order</h1>
+        <p class="tracking-subtitle">Stay updated on your service progress</p>
+      </div>
+
+      <div class="tracking-card">
+        <div class="tracking-card-header">
+          <div class="tracking-order-info">
+            <h3>Order #ORD-2024-001234</h3>
+            <p>Placed on January 15, 2024 at 10:30 AM</p>
+          </div>
+          <span class="tracking-status-badge in-progress">In Progress</span>
+        </div>
+
+        <div class="tracking-progress">
+          <div class="progress-bar-container">
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill" style="width: 50%;"></div>
+            </div>
+            <div class="progress-text">
+              <span class="progress-percentage" id="progressPercentage">50%</span>
+              <span class="progress-label">Complete</span>
+            </div>
+          </div>
+
+          <div class="tracking-timeline" id="trackingTimeline"></div>
+
+          <div class="artisan-info-card">
+            <div class="artisan-info-avatar">
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop" alt="David Chen">
+              <span class="artisan-info-status"></span>
+            </div>
+            <div class="artisan-info-details">
+              <h4>David Chen</h4>
+              <p>Electrician • 1.8 miles away</p>
+              <div class="artisan-info-rating">
+                <span>★</span> 5.0 (96 reviews)
+              </div>
+            </div>
+            <div class="artisan-info-actions">
+              <button class="artisan-info-btn" onclick="location.href='messages.html?chat=2'">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                Message
+              </button>
+              <button class="artisan-info-btn" onclick="showToast('Calling David Chen...', 'info')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                </svg>
+                Call
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tracking-actions">
+        <button class="tracking-btn tracking-btn-secondary" onclick="showToast('Cancellation request submitted', 'info')">Cancel Order</button>
+        <button class="tracking-btn tracking-btn-primary" onclick="location.href='messages.html?chat=2'">Contact Artisan</button>
+      </div>
+    </div>
+  </div>
+    </main>
+  </div>
+
+  <script src="../js/main.js"></script>
+  <script src="../js/dashboard.js"></script>
+  <script src="../js/tracking.js"></script>
+  <script>
+    // tracking.js expects #trackingTimeline; it will populate it.
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+      const nameEl = document.getElementById('sidebarUserName');
+      if (user && nameEl) nameEl.textContent = `${user.firstName || 'User'} ${user.lastName || ''}`.trim();
+    });
+  </script>
+</body>
+</html>
