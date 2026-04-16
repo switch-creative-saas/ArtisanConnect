@@ -538,6 +538,7 @@ function initProtectedPageGuard() {
     '/pages/hire-step-3.html',
     '/pages/hire-summary.html',
     '/pages/hire-payment.html',
+    '/pages/artisan-profile.html',
     '/pages/tracking.html',
     '/pages/orders.html',
     '/pages/track-order.html',

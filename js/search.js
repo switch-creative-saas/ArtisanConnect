@@ -513,6 +513,7 @@ function renderArtisans() {
         <div class="artisan-card-footer">
           <div class="artisan-card-price">${formatCurrency(artisan.price * 1000)}<span>/hr</span></div>
           <a href="hire-step-1.html?artisan=${artisan.id}" class="artisan-card-btn" onclick="handleHireClick(event, ${artisan.id})">Hire</a>
+          <a href="artisan-profile.html?artisan=${artisan.id}" class="artisan-card-btn artisan-card-btn-secondary">View Profile</a>
         </div>
       </div>
     </div>
@@ -763,6 +764,12 @@ function toggleFavorite(btn) {
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
-  initSearchPage();
-  initSwipePagination();
+  // Only initialize search UI when the page actually contains the search elements.
+  // This allows reusing `artisansData` on other dashboard pages (ex: artisan profile).
+  const hasSearch = !!document.getElementById('searchInput');
+  const hasGrid = !!document.getElementById('resultsGrid');
+  if (hasSearch && hasGrid) {
+    initSearchPage();
+    initSwipePagination();
+  }
 });
