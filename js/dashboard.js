@@ -28,6 +28,7 @@ function initSidebarReveal() {
   const sidebar = document.getElementById('dashboardSidebar');
   const overlay = document.getElementById('sidebarOverlay');
   const toggleBtn = document.getElementById('sidebarToggle');
+  const topbarRight = document.querySelector('.dashboard-topbar-right');
   if (!sidebar || !overlay) return;
 
   // Close on overlay click
@@ -73,6 +74,23 @@ function initSidebarReveal() {
       e.preventDefault();
       toggleSidebar();
     });
+  }
+
+  if (topbarRight && !document.getElementById('topbarNavToggle')) {
+    const btn = document.createElement('button');
+    btn.id = 'topbarNavToggle';
+    btn.className = 'topbar-nav-toggle';
+    btn.type = 'button';
+    btn.setAttribute('aria-label', 'Toggle navigation');
+    btn.innerHTML = `
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    `;
+    btn.addEventListener('click', toggleSidebar);
+    topbarRight.appendChild(btn);
   }
 }
 

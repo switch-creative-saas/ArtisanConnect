@@ -534,6 +534,22 @@
   max-width: 400px;
 }
 
+.chat-fab {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gradient-primary);
+  color: white;
+  box-shadow: var(--shadow-glow);
+  z-index: 40;
+}
+
 /* ============================================
    RESPONSIVE CHAT
    ============================================ */
@@ -549,25 +565,41 @@
 }
 
 @media (max-width: 768px) {
+  .chat-page {
+    padding-top: 0;
+  }
+
   .chat-container {
+    position: relative;
     flex-direction: column;
+    height: calc(100vh - 66px);
   }
   
   .chat-sidebar {
     width: 100%;
     height: 100%;
-    position: absolute;
-    z-index: 10;
-    transform: translateX(-100%);
-    transition: var(--transition-normal);
-  }
-  
-  .chat-sidebar.active {
-    transform: translateX(0);
+    position: relative;
+    transform: none;
+    z-index: 1;
+    border-right: 0;
   }
   
   .chat-main {
     width: 100%;
+    height: 100%;
+    display: none;
+  }
+
+  .chat-container.mobile-chat-open .chat-sidebar {
+    display: none;
+  }
+
+  .chat-container.mobile-chat-open .chat-main {
+    display: flex;
+  }
+
+  .chat-container.mobile-chat-open .chat-fab {
+    display: none;
   }
   
   .message {
@@ -576,5 +608,26 @@
   
   .chat-back-btn {
     display: flex;
+  }
+
+  .chat-header-actions {
+    display: none;
+  }
+
+  .chat-empty {
+    display: none;
+  }
+
+  .chat-fab {
+    display: flex;
+    right: 18px;
+    bottom: 18px;
+  }
+}
+
+@media (min-width: 769px) {
+  .chat-back-btn,
+  .chat-fab {
+    display: none !important;
   }
 }

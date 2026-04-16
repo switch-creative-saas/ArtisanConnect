@@ -290,7 +290,7 @@ function openConversation(chatId) {
   
   // On mobile, hide sidebar
   if (window.innerWidth <= 768) {
-    document.getElementById('chatSidebar').classList.remove('active');
+    document.getElementById('chatContainer')?.classList.add('mobile-chat-open');
   }
 }
 
@@ -487,7 +487,16 @@ function searchConversations() {
 // ============================================
 
 function showChatList() {
-  document.getElementById('chatSidebar').classList.add('active');
+  document.getElementById('chatContainer')?.classList.remove('mobile-chat-open');
+}
+
+function startNewConversation() {
+  showChatList();
+  const search = document.getElementById('chatSearch');
+  if (search) {
+    search.focus();
+    showToast('Search for an artisan to start a new conversation', 'info');
+  }
 }
 
 // ============================================
