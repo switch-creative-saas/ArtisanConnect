@@ -195,38 +195,82 @@ function handleLogin(event) {
   // Show loading state
   submitBtn.disabled = true;
   submitBtn.innerHTML = '<span class="loader loader-sm"></span> Signing in...';
-  
-  // Simulate API call
-  setTimeout(() => {
-    // Mock successful login
-    const user = {
-      id: '12345',
-      email: email,
-      firstName: 'John',
-      lastName: 'Doe',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop'
+
+  const root = typeof getSiteRootPrefix === 'function'
+    ? getSiteRootPrefix()
+    : (window.location.pathname.replace(/\\/g, '/').includes('/pages/') ? '../' : '');
+
+  const normalizeBackendUser = (u) => {
+    if (!u) return null;
+    if (u.firstName || u.lastName) return u;
+    const fullName = String(u.name || '').trim();
+    const parts = fullName ? fullName.split(/\s+/).filter(Boolean) : [];
+    const firstName = parts[0] || 'User';
+    const lastName = parts.length > 1 ? parts.slice(1).join(' ') : '';
+    return {
+      id: u.id,
+      email: u.email || null,
+      firstName,
+      lastName,
+      avatar: u.avatar || u.avatar_url || null,
+      name: fullName || (u.email ? u.email : 'User')
     };
-    
-    // Store user data
-    setStorage('user', user, !rememberMe);
-    setStorage('token', 'mock-jwt-token-' + Date.now(), !rememberMe);
-    
-    // Show success state
-    showSuccessState('Welcome Back!', 'Redirecting you to your dashboard...');
-    
-    // Redirect to dashboard
-    setTimeout(() => {
-      try {
-        const next = sessionStorage.getItem('postAuthRedirect');
-        if (next) {
-          sessionStorage.removeItem('postAuthRedirect');
-          window.location.href = next;
-          return;
-        }
-      } catch (e) {}
-      window.location.href = 'dashboard.html';
-    }, 1500);
-  }, 1500);
+  };
+
+  (async () => {
+    try {
+      const apiBase = typeof getApiBaseUrl === 'function' ? getApiBaseUrl() : `${root}backend/api`;
+      const res = await fetch(`${apiBase}/auth/login.php`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ email, password }).toString()
+      });
+
+      if (!res.ok) {
+        let err = null;
+        try { err = await res.json(); } catch (e) {}
+        const details = err?.error ? `: ${err.error}` : '';
+        showError('loginError', `Login failed${details}.`);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Sign In';
+        return;
+      }
+
+      const data = await res.json();
+      const user = normalizeBackendUser(data?.user);
+      if (!user) {
+        showError('loginError', 'Login failed. Invalid server response.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Sign In';
+        return;
+      }
+
+      // Store user data
+      setStorage('user', user, !rememberMe);
+      
+      // Show success state
+      showSuccessState('Welcome Back!', 'Redirecting you to your dashboard...');
+      
+      // Redirect to dashboard
+      setTimeout(() => {
+        try {
+          const next = sessionStorage.getItem('postAuthRedirect');
+          if (next) {
+            sessionStorage.removeItem('postAuthRedirect');
+            window.location.href = next;
+            return;
+          }
+        } catch (e) {}
+        window.location.href = 'dashboard.html';
+      }, 1500);
+    } catch (e) {
+      console.error('Login fetch failed:', e);
+      showError('loginError', `Network error. ${e?.message ? e.message : 'Please try again.'}`);
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Sign In';
+    }
+  })();
 }
 
 // ============================================
@@ -247,38 +291,86 @@ function handleRegister(event) {
   // Show loading state
   submitBtn.disabled = true;
   submitBtn.innerHTML = '<span class="loader loader-sm"></span> Creating account...';
-  
-  // Simulate API call
-  setTimeout(() => {
-    // Mock successful registration
-    const user = {
-      id: '12345',
-      email: email,
-      firstName: firstName,
-      lastName: lastName,
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop'
+
+  const root = typeof getSiteRootPrefix === 'function'
+    ? getSiteRootPrefix()
+    : (window.location.pathname.replace(/\\/g, '/').includes('/pages/') ? '../' : '');
+
+  const normalizeBackendUser = (u) => {
+    if (!u) return null;
+    if (u.firstName || u.lastName) return u;
+    const fullName = String(u.name || '').trim();
+    const parts = fullName ? fullName.split(/\s+/).filter(Boolean) : [];
+    const f = parts[0] || 'User';
+    const l = parts.length > 1 ? parts.slice(1).join(' ') : '';
+    return {
+      id: u.id,
+      email: u.email || null,
+      firstName: f,
+      lastName: l,
+      avatar: u.avatar || u.avatar_url || null,
+      name: fullName || (u.email ? u.email : 'User')
     };
-    
-    // Store user data
-    setStorage('user', user);
-    setStorage('token', 'mock-jwt-token-' + Date.now());
-    
-    // Show success state
-    showSuccessState('Account Created!', 'Welcome to ArtisanConnect. Redirecting...');
-    
-    // Redirect to dashboard
-    setTimeout(() => {
-      try {
-        const next = sessionStorage.getItem('postAuthRedirect');
-        if (next) {
-          sessionStorage.removeItem('postAuthRedirect');
-          window.location.href = next;
-          return;
-        }
-      } catch (e) {}
-      window.location.href = 'dashboard.html';
-    }, 1500);
-  }, 1500);
+  };
+
+  (async () => {
+    try {
+      const apiBase = typeof getApiBaseUrl === 'function' ? getApiBaseUrl() : `${root}backend/api`;
+      const res = await fetch(`${apiBase}/auth/register.php`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          name: `${firstName} ${lastName}`.trim(),
+          email,
+          password
+        }).toString()
+      });
+
+      if (!res.ok) {
+        let err = null;
+        try { err = await res.json(); } catch (e) {}
+        const details = err?.error ? `: ${err.error}` : '';
+        showError('registerError', `Sign up failed${details}.`);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create Account';
+        return;
+      }
+
+      const data = await res.json();
+      const user = normalizeBackendUser(data?.user);
+      if (!user) {
+        showError('registerError', 'Sign up failed. Invalid server response.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create Account';
+        return;
+      }
+
+      // Store user data
+      setStorage('user', user);
+      
+      // Show success state
+      showSuccessState('Account Created!', 'Welcome to ArtisanConnect. Redirecting...');
+      
+      // Redirect to dashboard
+      setTimeout(() => {
+        try {
+          const next = sessionStorage.getItem('postAuthRedirect');
+          if (next) {
+            sessionStorage.removeItem('postAuthRedirect');
+            window.location.href = next;
+            return;
+          }
+        } catch (e) {}
+        window.location.href = 'dashboard.html';
+      }, 1500);
+    } catch (e) {
+      console.error('Register fetch failed:', e);
+      showError('registerError', `Network error. ${e?.message ? e.message : 'Please try again.'}`);
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Create Account';
+    }
+  })();
 }
 
 // ============================================

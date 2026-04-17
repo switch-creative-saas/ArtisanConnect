@@ -126,7 +126,8 @@ function animateStats() {
 // ============================================
 
 function checkAuth() {
-  const user = getStorage('user');
+  // Backend login hydrates `user` into localStorage OR sessionStorage depending on "remember me".
+  const user = getStorage('user') || getStorage('user', true);
   if (!user) {
     showToast('Please sign in to access the dashboard', 'warning');
     setTimeout(() => {
@@ -142,7 +143,7 @@ function checkAuth() {
 // ============================================
 
 function loadUserData() {
-  const user = getStorage('user');
+  const user = getStorage('user') || getStorage('user', true);
   if (!user) return;
   
   // Update user name in sidebar

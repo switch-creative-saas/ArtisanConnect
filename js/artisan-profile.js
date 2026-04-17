@@ -17,13 +17,24 @@ function renderStars(rating) {
   return stars || '—';
 }
 
-function initArtisanProfile() {
+async function initArtisanProfile() {
   const artisanIdRaw = getQueryParam('artisan');
   const artisanId = Number(artisanIdRaw);
-  if (!Number.isFinite(artisanId) || typeof artisansData === 'undefined') return;
+  if (!Number.isFinite(artisanId)) return;
 
-  const artisan = artisansData.find(a => a.id === artisanId);
-  if (!artisan) return;
+  const apiBase = typeof getApiBaseUrl === 'function'
+    ? getApiBaseUrl()
+    : `${typeof getSiteRootPrefix === 'function' ? getSiteRootPrefix() : ''}backend/api`;
+
+  async function fetchJson(url) {
+    const res = await fetch(url, { credentials: 'include' });
+    if (!res.ok) return null;
+    return await res.json();
+  }
+
+  const show = await fetchJson(`${apiBase}/artisans/show.php?id=${encodeURIComponent(artisanId)}`);
+  if (!show?.ok || !show?.artisan) return;
+  const artisan = show.artisan;
 
   const cover = document.getElementById('artisanProfileCover');
   const avatar = document.getElementById('artisanProfileAvatar');
@@ -39,77 +50,66 @@ function initArtisanProfile() {
 
   if (cover) cover.src = artisan.image || artisan.avatar || '';
   if (avatar) avatar.src = artisan.avatar || '';
-  if (name) name.textContent = artisan.name;
-  if (service) service.textContent = artisan.service;
-  if (ratingEl) ratingEl.textContent = `${artisan.rating} ★`;
+  if (name) name.textContent = artisan.name || '';
+  if (service) service.textContent = artisan.service || '';
+  if (ratingEl) ratingEl.textContent = `${artisan.rating || 0} ★`;
   if (locationEl) locationEl.textContent = `${artisan.city || ''}${artisan.state ? `, ${artisan.state}` : ''}`.trim();
 
   if (tagsEl) {
-    tagsEl.innerHTML = artisan.tags
-      .map(t => `<span class="artisan-tag">${t}</span>`)
-      .join('');
+    const tags = Array.isArray(artisan.tags) ? artisan.tags : [];
+    tagsEl.innerHTML = tags.map(t => `<span class="artisan-tag">${t}</span>`).join('');
   }
 
   if (hireBtn) {
     hireBtn.href = `hire-step-1.html?artisan=${artisan.id}`;
     hireBtn.onclick = (e) => {
-      // Let the existing hire guard in hire-flow handle auth redirects
+      // Let the existing hire guard handle auth redirects.
       e.stopPropagation();
     };
   }
 
-  // Works (mock)
+  // Works (from API)
   if (worksGrid) {
-    const works = [
-      { title: `${artisan.service} Project`, desc: 'Completed with high-quality finishing', img: artisan.image },
-      { title: `Before & After`, desc: 'Improved condition and performance', img: artisan.image },
-      { title: 'Repairs & Upgrades', desc: 'Diagnostics, repair, and refinement', img: artisan.image }
-    ];
-    worksGrid.innerHTML = works
+    const worksRes = await fetchJson(`${apiBase}/artisans/works.php?id=${encodeURIComponent(artisanId)}`);
+    const works = worksRes?.ok ? worksRes.works : [];
+    worksGrid.innerHTML = (works || [])
       .map(w => `
         <div class="works-card">
-          <img src="${w.img}" alt="${w.title}">
+          <img src="${w.image || ''}" alt="${w.title || 'Work'}">
           <div class="works-card-body">
-            <div class="works-card-title">${w.title}</div>
-            <div class="works-card-desc">${w.desc}</div>
+            <div class="works-card-title">${w.title || ''}</div>
+            <div class="works-card-desc"></div>
           </div>
         </div>
       `).join('');
   }
 
-  // Reviews (mock; tailored to artisan)
+  // Reviews (from API)
   if (reviewsGrid) {
-    const baseName = artisan.name.split(' ')[0];
-    const reviews = [
-      { name: `Kemi (${artisan.city || 'Nigeria'})`, rating: Math.min(5, artisan.rating + 0.1), text: `Working with ${baseName} was smooth. They communicated well and delivered on time.`, date: 'Just now' },
-      { name: `Tolu (${artisan.state || 'Lagos'})`, rating: artisan.rating, text: `Great job on the ${artisan.service.toLowerCase()}. The results look clean and professional.`, date: 'Yesterday' },
-      { name: `Chisom (${artisan.city || 'Enugu'})`, rating: Math.max(3.5, artisan.rating - 0.2), text: `Very professional. Some minor delays, but the final work was worth it.`, date: '2 days ago' }
-    ];
+    const reviewsRes = await fetchJson(`${apiBase}/artisans/reviews.php?id=${encodeURIComponent(artisanId)}`);
+    const reviews = reviewsRes?.ok ? reviewsRes.reviews : [];
 
-    reviewsGrid.innerHTML = reviews
-      .map(r => `
-        <div class="review-card">
-          <div class="review-head">
-            <div class="review-name">${r.name}</div>
-            <div class="review-stars">${renderStars(r.rating)}</div>
-          </div>
-          <div class="review-text">${r.text}</div>
-          <div class="review-date">${r.date}</div>
+    reviewsGrid.innerHTML = (reviews || []).map(r => `
+      <div class="review-card">
+        <div class="review-head">
+          <div class="review-name">${r.name || ''}</div>
+          <div class="review-stars">${renderStars(r.rating || 0)}</div>
         </div>
-      `).join('');
+        <div class="review-text">${r.text || ''}</div>
+        <div class="review-date">${r.date || ''}</div>
+      </div>
+    `).join('');
   }
 
+  // Messaging: keep existing URL behavior for now.
   if (messageBtn) {
     messageBtn.addEventListener('click', () => {
-      const chatId = artisan.id; // reuse artisan id as mock chat id
-      window.location.href = `messages.html?chat=${chatId}`;
+      window.location.href = `messages.html?chat=${artisan.id}`;
     });
   }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // `search.js` exposes `artisansData` on window; we intentionally guard to avoid crashing.
-  if (typeof artisansData === 'undefined') return;
   initArtisanProfile();
 });
 

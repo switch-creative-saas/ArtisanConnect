@@ -242,14 +242,60 @@ function clearAuthStorage() {
 // ============================================
 
 function isLoggedIn() {
-  return !!getStorage('user');
+  return !!getStorage('user') || !!getStorage('user', true);
 }
 
 function getCurrentUser() {
-  return getStorage('user');
+  return getStorage('user') || getStorage('user', true);
+}
+
+function normalizeBackendUserForFrontend(user) {
+  if (!user) return null;
+  // If we already have the frontend-shaped user object, keep it.
+  if (user.firstName || user.lastName) return user;
+
+  const fullName = String(user.name || user.fullName || '').trim();
+  const parts = fullName ? fullName.split(/\s+/).filter(Boolean) : [];
+  const firstName = parts[0] || 'User';
+  const lastName = parts.length > 1 ? parts.slice(1).join(' ') : '';
+
+  return {
+    id: user.id,
+    name: fullName || (user.email ? user.email : 'User'),
+    firstName,
+    lastName,
+    email: user.email || null,
+    avatar: user.avatar || user.avatar_url || null
+  };
+}
+
+async function initAuthFromBackend() {
+  // Hydrate local `user` from the backend session cookie.
+  const meUrl = `${getApiBaseUrl()}/auth/me.php`;
+
+  try {
+    const res = await fetch(meUrl, { credentials: 'include' });
+    if (res.status === 401) {
+      clearAuthStorage();
+      return;
+    }
+    if (!res.ok) return;
+
+    const data = await res.json();
+    if (data?.ok && data?.user) {
+      setStorage('user', normalizeBackendUserForFrontend(data.user));
+    }
+  } catch (e) {
+    // If the backend isn't running (yet), keep existing localStorage user as fallback.
+  }
 }
 
 function logout() {
+  // Best-effort backend logout (session cookie). Always clear frontend storage.
+  try {
+    fetch(`${getApiBaseUrl()}/auth/logout.php`, { method: 'POST', credentials: 'include' });
+  } catch (e) {}
+
   clearAuthStorage();
   showToast('Logged out successfully', 'success');
   setTimeout(() => {
@@ -261,6 +307,16 @@ function getSiteRootPrefix() {
   // Pages live at /pages/*.html. From /pages/* we need "../", from root we need "".
   const path = window.location.pathname.replace(/\\/g, '/');
   return path.includes('/pages/') ? '../' : '';
+}
+
+function getAppBasePath() {
+  const path = window.location.pathname.replace(/\\/g, '/');
+  const parts = path.split('/').filter(Boolean);
+  return parts.length ? `/${parts[0]}` : '';
+}
+
+function getApiBaseUrl() {
+  return `${getAppBasePath()}/backend/api`;
 }
 
 function ensureAuthModal() {
@@ -382,7 +438,7 @@ function ensureAuthModal() {
   tabLogin.addEventListener('click', () => setMode('login'));
   tabSignup.addEventListener('click', () => setMode('signup'));
 
-  loginForm.addEventListener('submit', (e) => {
+  loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = modal.querySelector('#authGateLoginEmail').value.trim();
     const password = modal.querySelector('#authGateLoginPassword').value;
@@ -391,21 +447,39 @@ function ensureAuthModal() {
       errorEl.style.display = 'block';
       return;
     }
-    const user = {
-      id: 'u-' + Date.now(),
-      email,
-      firstName: 'John',
-      lastName: 'Doe',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop'
-    };
-    setStorage('user', user);
-    setStorage('token', 'mock-jwt-' + Date.now());
+    try {
+      const res = await fetch(`${getApiBaseUrl()}/auth/login.php`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ email, password }).toString()
+      });
+
+      if (!res.ok) {
+        let err = null;
+        try { err = await res.json(); } catch (e) {}
+        const msg = err?.error || 'Sign in failed. Please try again.';
+        errorEl.textContent = msg;
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      const data = await res.json();
+      if (data?.ok && data?.user) {
+        setStorage('user', normalizeBackendUserForFrontend(data.user));
+      }
+    } catch (err) {
+      errorEl.textContent = 'Network error. Please try again.';
+      errorEl.style.display = 'block';
+      return;
+    }
+
     closeModal('authGateModal');
     showToast('Signed in successfully', 'success');
     runPostAuthActionOrRedirect();
   });
 
-  signupForm.addEventListener('submit', (e) => {
+  signupForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const firstName = modal.querySelector('#authGateFirstName').value.trim();
     const lastName = modal.querySelector('#authGateLastName').value.trim();
@@ -416,15 +490,38 @@ function ensureAuthModal() {
       errorEl.style.display = 'block';
       return;
     }
-    const user = {
-      id: 'u-' + Date.now(),
-      email,
-      firstName,
-      lastName,
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop'
-    };
-    setStorage('user', user);
-    setStorage('token', 'mock-jwt-' + Date.now());
+
+    try {
+      const res = await fetch(`${getApiBaseUrl()}/auth/register.php`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          name: `${firstName} ${lastName}`.trim(),
+          email,
+          password
+        }).toString()
+      });
+
+      if (!res.ok) {
+        let err = null;
+        try { err = await res.json(); } catch (e) {}
+        const msg = err?.error || 'Sign up failed. Please try again.';
+        errorEl.textContent = msg;
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      const data = await res.json();
+      if (data?.ok && data?.user) {
+        setStorage('user', normalizeBackendUserForFrontend(data.user));
+      }
+    } catch (err) {
+      errorEl.textContent = 'Network error. Please try again.';
+      errorEl.style.display = 'block';
+      return;
+    }
+
     closeModal('authGateModal');
     showToast('Account created', 'success');
     runPostAuthActionOrRedirect();
@@ -472,6 +569,12 @@ function runPostAuthActionOrRedirect() {
   const nextAction = takePostAuthAction();
   if (nextAction?.action === 'hire') {
     const { artisanId, artisanName } = nextAction.payload || {};
+    const root = getSiteRootPrefix();
+    if (artisanId) {
+      showToast(`Request started${artisanName ? ` for ${artisanName}` : ''}!`, 'success');
+      window.location.href = `${root}pages/hire-step-1.html?artisan=${encodeURIComponent(artisanId)}`;
+      return;
+    }
     showToast(`Request sent${artisanName ? ` to ${artisanName}` : ''}!`, 'success');
     return;
   }
@@ -504,13 +607,16 @@ function initHireGuards() {
 
     // allow normal behavior when logged in
     if (isLoggedIn()) {
-      // If it's a link with an href, let navigation happen (consistent flow to checkout/profile pages).
-      if (el.tagName === 'A' && el.getAttribute('href') && el.getAttribute('href') !== '#') {
-        return;
+      // If it's an anchor, let navigation happen.
+      if (el.tagName === 'A' && el.getAttribute('href') && el.getAttribute('href') !== '#') return;
+
+      // For buttons, always redirect into the hire flow.
+      const artisanId = el.getAttribute('data-artisan-id');
+      if (artisanId) {
+        e.preventDefault();
+        const root = getSiteRootPrefix();
+        window.location.href = `${root}pages/hire-step-1.html?artisan=${encodeURIComponent(artisanId)}`;
       }
-      e.preventDefault();
-      const name = el.getAttribute('data-artisan-name') || '';
-      showToast(`Request sent${name ? ` to ${name}` : ''}!`, 'success');
       return;
     }
 
@@ -696,12 +802,14 @@ document.head.appendChild(rippleStyle);
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
-  initProtectedPageGuard();
-  initNavbar();
-  initMobileMenu();
-  initModals();
-  animateOnScroll();
-  initRippleEffect();
-  updateNavForAuth();
-  initHireGuards();
+  initAuthFromBackend().finally(() => {
+    initProtectedPageGuard();
+    initNavbar();
+    initMobileMenu();
+    initModals();
+    animateOnScroll();
+    initRippleEffect();
+    updateNavForAuth();
+    initHireGuards();
+  });
 });

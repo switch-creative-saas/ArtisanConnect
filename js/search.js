@@ -6,7 +6,7 @@
 // MOCK ARTISAN DATA
 // ============================================
 
-const artisansData = [
+let artisansData = [
   {
     id: 1,
     name: 'Mike Johnson',
@@ -306,7 +306,7 @@ const pageSize = 8;
 // INITIALIZE SEARCH PAGE
 // ============================================
 
-function initSearchPage() {
+async function initSearchPage() {
   // Check for URL params
   const urlParams = new URLSearchParams(window.location.search);
   const searchParam = urlParams.get('search');
@@ -324,8 +324,24 @@ function initSearchPage() {
   if (categoryParam) {
     document.getElementById('categoryFilter').value = categoryParam;
   }
-  
-  // Initial filter
+
+  // Load real artisans from backend (falls back to the mock data if API fails).
+  try {
+    const apiBase = typeof getApiBaseUrl === 'function'
+      ? getApiBaseUrl()
+      : `${typeof getSiteRootPrefix === 'function' ? getSiteRootPrefix() : ''}backend/api`;
+    const res = await fetch(`${apiBase}/artisans/index.php`, { credentials: 'include' });
+    if (res.ok) {
+      const data = await res.json();
+      if (data?.ok && Array.isArray(data?.artisans)) {
+        artisansData = data.artisans;
+      }
+    }
+  } catch (e) {
+    // Keep existing mock `artisansData`.
+  }
+
+  // Initial filter (re-runs with updated `artisansData`).
   filterArtisans();
 }
 

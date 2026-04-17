@@ -6,7 +6,7 @@
 // MOCK CHAT DATA
 // ============================================
 
-const conversationsData = [
+let conversationsData = [
   {
     id: 1,
     artisanId: 1,
@@ -180,7 +180,25 @@ let isTyping = false;
 // INITIALIZE CHAT PAGE
 // ============================================
 
-function initChatPage() {
+async function initChatPage() {
+  // Load conversations from backend.
+  try {
+    const apiBase = typeof getApiBaseUrl === 'function'
+      ? getApiBaseUrl()
+      : `${typeof getSiteRootPrefix === 'function' ? getSiteRootPrefix() : ''}backend/api`;
+    const res = await fetch(`${apiBase}/conversations/index.php`, {
+      credentials: 'include'
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data?.ok && Array.isArray(data?.conversations)) {
+        conversationsData = data.conversations;
+      }
+    }
+  } catch (e) {
+    // If the backend isn't running, keep mock/fallback `conversationsData`.
+  }
+
   renderChatList();
   
   // Check for URL param to open specific chat
@@ -256,7 +274,7 @@ function renderChatList() {
 // OPEN CONVERSATION
 // ============================================
 
-function openConversation(chatId) {
+async function openConversation(chatId) {
   activeConversationId = chatId;
   const conversation = conversationsData.find(c => c.id === chatId);
   if (!conversation) return;
@@ -278,6 +296,24 @@ function openConversation(chatId) {
   // Update typing indicator avatar
   document.getElementById('typingAvatar').src = conversation.avatar;
   
+  // Load messages from backend before rendering.
+  try {
+    const apiBase = typeof getApiBaseUrl === 'function'
+      ? getApiBaseUrl()
+      : `${typeof getSiteRootPrefix === 'function' ? getSiteRootPrefix() : ''}backend/api`;
+    const res = await fetch(`${apiBase}/conversations/messages.php?id=${encodeURIComponent(chatId)}`, {
+      credentials: 'include'
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data?.ok && Array.isArray(data?.messages)) {
+        conversation.messages = data.messages;
+      }
+    }
+  } catch (e) {
+    // Ignore and render whatever messages we already have.
+  }
+
   // Render messages
   renderMessages(conversation);
   
@@ -340,7 +376,7 @@ function renderMessages(conversation) {
 // SEND MESSAGE
 // ============================================
 
-function sendMessage() {
+async function sendMessage() {
   const input = document.getElementById('messageInput');
   const text = input.value.trim();
   
@@ -348,31 +384,44 @@ function sendMessage() {
   
   const conversation = conversationsData.find(c => c.id === activeConversationId);
   if (!conversation) return;
-  
-  // Add message
-  const newMessage = {
-    id: Date.now(),
-    sender: 'me',
-    text: text,
-    time: 'Just now',
-    status: 'sent'
-  };
-  
-  conversation.messages.push(newMessage);
-  conversation.lastMessage = text;
-  conversation.lastMessageTime = 'Just now';
-  
-  // Clear input
-  input.value = '';
-  input.style.height = 'auto';
-  
-  // Re-render
-  renderMessages(conversation);
-  renderChatList();
-  scrollToBottom();
-  
-  // Simulate reply after delay
-  simulateReply(conversation);
+
+  try {
+    const apiBase = typeof getApiBaseUrl === 'function'
+      ? getApiBaseUrl()
+      : `${typeof getSiteRootPrefix === 'function' ? getSiteRootPrefix() : ''}backend/api`;
+    const res = await fetch(`${apiBase}/conversations/messages.php?id=${encodeURIComponent(activeConversationId)}`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: text })
+    });
+
+    if (!res.ok) {
+      let err = null;
+      try { err = await res.json(); } catch (e) {}
+      showToast(err?.error || 'Could not send message.', 'error');
+      return;
+    }
+
+    const data = await res.json();
+    const newMessage = data?.message;
+    if (newMessage && Array.isArray(conversation.messages)) {
+      conversation.messages.push(newMessage);
+      conversation.lastMessage = newMessage.text;
+      conversation.lastMessageTime = newMessage.time || 'Just now';
+    }
+
+    // Clear input
+    input.value = '';
+    input.style.height = 'auto';
+
+    // Re-render
+    renderMessages(conversation);
+    renderChatList();
+    scrollToBottom();
+  } catch (e) {
+    showToast('Network error. Please try again.', 'error');
+  }
 }
 
 // ============================================

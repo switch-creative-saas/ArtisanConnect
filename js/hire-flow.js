@@ -279,44 +279,8 @@ function initPayment() {
   });
 
   function saveOrderAndNotify(updatedDraft, finalPricing, noteText, redirectToChat = true) {
-    const order = {
-      id: 'ORD-' + Date.now(),
-      artisanId: updatedDraft.artisanId,
-      artisanName: updatedDraft.artisan.name,
-      service: updatedDraft.artisan.service,
-      category: updatedDraft.artisan.category,
-      needs: updatedDraft.needs,
-      address: updatedDraft.address,
-      hours: updatedDraft.hours,
-      hourlyRate: updatedDraft.artisan.hourlyRate,
-      materialsEstimate: finalPricing.materialsFee,
-      platformFee: finalPricing.platformFee,
-      taxRate: finalPricing.taxRate,
-      amount: finalPricing.total,
-      paymentMethod: updatedDraft.paymentMethod,
-      status: updatedDraft.paymentMethod === 'transfer' ? 'awaiting-confirmation' : 'pending',
-      date: new Date().toISOString()
-    };
-
-    const orders = JSON.parse(localStorage.getItem('orders') || '[]');
-    orders.push(order);
-    localStorage.setItem('orders', JSON.stringify(orders));
-
-    try {
-      const text = noteText || `New hire request placed: "${updatedDraft.needs}" · ${updatedDraft.hours}hr · Total ${formatNaira(finalPricing.total)}.`;
-      sessionStorage.setItem('pendingChatNotification', JSON.stringify({
-        chatId: updatedDraft.artisan.chatId || updatedDraft.artisanId,
-        text
-      }));
-    } catch (e) {}
-
-    sessionStorage.removeItem(HIRE_FLOW_STORAGE_KEY);
-
-    if (redirectToChat) {
-      setTimeout(() => {
-        window.location.href = `messages.html?chat=${updatedDraft.artisan.chatId || updatedDraft.artisanId}`;
-      }, 650);
-    }
+    // Legacy path retained for backwards compatibility. The real payment step now calls the backend.
+    console.warn('saveOrderAndNotify is legacy; use backend hire/create instead.');
   }
 
   payBtn?.addEventListener('click', () => {
@@ -346,11 +310,53 @@ function initPayment() {
     payBtn.disabled = true;
     if (payBtnText) payBtnText.textContent = 'Processing...';
 
-    setTimeout(() => {
-      const finalPricing = getPricing(updated);
-      showToast('Payment successful. Notifying artisan…', 'success');
-      saveOrderAndNotify(updated, finalPricing, null, true);
-    }, 1200);
+    (async () => {
+      try {
+        const finalPricing = getPricing(updated);
+        // Prefer backend pricing (source of truth), but keep UI calculation for immediate feedback.
+        showToast('Payment successful. Notifying artisan…', 'success');
+
+        const apiBase = typeof getApiBaseUrl === 'function'
+          ? getApiBaseUrl()
+          : `${typeof getSiteRootPrefix === 'function' ? getSiteRootPrefix() : ''}backend/api`;
+        const res = await fetch(`${apiBase}/hire/create.php`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            artisanId: updated.artisanId,
+            needs: updated.needs,
+            address: updated.address,
+            hours: updated.hours,
+            materialsEstimate: updated.materialsEstimate,
+            paymentMethod: updated.paymentMethod
+          })
+        });
+
+        if (!res.ok) {
+          let err = null;
+          try { err = await res.json(); } catch (e) {}
+          showToast(err?.error || 'Checkout failed. Please try again.', 'error');
+          payBtn.disabled = false;
+          if (payBtnText) payBtnText.textContent = `Pay ${formatNaira(finalPricing.total)}`;
+          return;
+        }
+
+        const data = await res.json();
+        if (!data?.ok || !data?.conversationId) {
+          showToast('Checkout succeeded but redirect failed. Please try again.', 'warning');
+          payBtn.disabled = false;
+          if (payBtnText) payBtnText.textContent = `Pay ${formatNaira(finalPricing.total)}`;
+          return;
+        }
+
+        sessionStorage.removeItem(HIRE_FLOW_STORAGE_KEY);
+        window.location.href = `messages.html?chat=${encodeURIComponent(data.conversationId)}`;
+      } catch (e) {
+        showToast('Network error. Please try again.', 'error');
+        payBtn.disabled = false;
+      }
+    })();
   });
 
   confirmTransferBtn?.addEventListener('click', () => {
@@ -359,7 +365,46 @@ function initPayment() {
     const finalPricing = getPricing(updated);
     const note = `Hi ${updated.artisan.name}, I’ve made a bank transfer for ${formatNaira(finalPricing.total)}. Reference: ${ref}. Please confirm when received.`;
     showToast('Transfer noted. Opening Messages…', 'success');
-    saveOrderAndNotify(updated, finalPricing, note, true);
+    (async () => {
+      try {
+        showToast('Transfer noted. Notifying artisan…', 'success');
+
+        const apiBase = typeof getApiBaseUrl === 'function'
+          ? getApiBaseUrl()
+          : `${typeof getSiteRootPrefix === 'function' ? getSiteRootPrefix() : ''}backend/api`;
+        const res = await fetch(`${apiBase}/hire/create.php`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            artisanId: updated.artisanId,
+            needs: updated.needs,
+            address: updated.address,
+            hours: updated.hours,
+            materialsEstimate: updated.materialsEstimate,
+            paymentMethod: 'transfer'
+          })
+        });
+
+        if (!res.ok) {
+          let err = null;
+          try { err = await res.json(); } catch (e) {}
+          showToast(err?.error || 'Checkout failed. Please try again.', 'error');
+          return;
+        }
+
+        const data = await res.json();
+        if (!data?.ok || !data?.conversationId) {
+          showToast('Checkout succeeded but redirect failed. Please try again.', 'warning');
+          return;
+        }
+
+        sessionStorage.removeItem(HIRE_FLOW_STORAGE_KEY);
+        window.location.href = `messages.html?chat=${encodeURIComponent(data.conversationId)}`;
+      } catch (e) {
+        showToast('Network error. Please try again.', 'error');
+      }
+    })();
   });
 }
 
