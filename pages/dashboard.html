@@ -73,7 +73,7 @@
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                 </svg>
                 Messages
-                <span class="sidebar-nav-badge">3</span>
+                <span class="sidebar-nav-badge" id="sidebarMessagesBadge" style="display:none;">0</span>
               </a>
             </li>
             <li class="sidebar-nav-item">
@@ -190,10 +190,10 @@
                 <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
                 <polyline points="17 6 23 6 23 12"></polyline>
               </svg>
-              +12%
+              --
             </div>
           </div>
-          <div class="stat-value">12</div>
+          <div class="stat-value" id="statTotalOrders">0</div>
           <div class="stat-label">Total Orders</div>
         </div>
 
@@ -210,10 +210,10 @@
                 <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
                 <polyline points="17 6 23 6 23 12"></polyline>
               </svg>
-              +8%
+              --
             </div>
           </div>
-          <div class="stat-value">8</div>
+          <div class="stat-value" id="statCompletedOrders">0</div>
           <div class="stat-label">Completed</div>
         </div>
 
@@ -230,10 +230,10 @@
                 <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
                 <polyline points="17 18 23 18 23 12"></polyline>
               </svg>
-              -2
+              --
             </div>
           </div>
-          <div class="stat-value">3</div>
+          <div class="stat-value" id="statInProgressOrders">0</div>
           <div class="stat-label">In Progress</div>
         </div>
 
@@ -249,10 +249,10 @@
                 <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
                 <polyline points="17 6 23 6 23 12"></polyline>
               </svg>
-              +5
+              --
             </div>
           </div>
-          <div class="stat-value">5</div>
+          <div class="stat-value" id="statNewMessages">0</div>
           <div class="stat-label">New Messages</div>
         </div>
       </div>
@@ -275,53 +275,7 @@
                   <th>Amount</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <div class="order-artisan">
-                      <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop" alt="David Chen" class="order-artisan-avatar">
-                      <span class="order-artisan-name">David Chen</span>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="order-service">Electrical Repair</div>
-                  </td>
-                  <td>
-                    <span class="order-status in-progress">In Progress</span>
-                  </td>
-                  <td class="order-amount">₦150,000</td>
-                </tr>
-                <tr>
-                  <td>
-                    <div class="order-artisan">
-                      <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop" alt="Sarah Johnson" class="order-artisan-avatar">
-                      <span class="order-artisan-name">Sarah Johnson</span>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="order-service">Plumbing Fix</div>
-                  </td>
-                  <td>
-                    <span class="order-status pending">Pending</span>
-                  </td>
-                  <td class="order-amount">₦85,000</td>
-                </tr>
-                <tr>
-                  <td>
-                    <div class="order-artisan">
-                      <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop" alt="Robert Williams" class="order-artisan-avatar">
-                      <span class="order-artisan-name">Robert Williams</span>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="order-service">Furniture Assembly</div>
-                  </td>
-                  <td>
-                    <span class="order-status completed">Completed</span>
-                  </td>
-                  <td class="order-amount">₦120,000</td>
-                </tr>
-              </tbody>
+              <tbody id="recentOrdersBody"></tbody>
             </table>
           </div>
         </div>
@@ -333,96 +287,19 @@
           <a href="order-history.html" class="dashboard-card-action">View All</a>
           </div>
           <div class="dashboard-card-body">
-            <div class="activity-list">
-              <div class="activity-item">
-                <div class="activity-icon request">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                  </svg>
-                </div>
-                <div class="activity-content">
-                  <div class="activity-title">New service request sent</div>
-                  <div class="activity-meta">To David Chen - Electrical Repair</div>
-                </div>
-                <div class="activity-time">2h ago</div>
-              </div>
-              
-              <div class="activity-item">
-                <div class="activity-icon completed">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                  </svg>
-                </div>
-                <div class="activity-content">
-                  <div class="activity-title">Order completed</div>
-                  <div class="activity-meta">Robert Williams - Furniture Assembly</div>
-                </div>
-                <div class="activity-time">1d ago</div>
-              </div>
-              
-              <div class="activity-item">
-                <div class="activity-icon review">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                  </svg>
-                </div>
-                <div class="activity-content">
-                  <div class="activity-title">Left a review</div>
-                  <div class="activity-meta">5 stars for Robert Williams</div>
-                </div>
-                <div class="activity-time">1d ago</div>
-              </div>
-            </div>
+            <div class="activity-list" id="recentActivityList"></div>
           </div>
         </div>
       </div>
 
-      <!-- Recommended Artisans -->
+      <!-- Recent Messages -->
       <div class="dashboard-card" style="margin-top: var(--space-xl);">
         <div class="dashboard-card-header">
-          <h3 class="dashboard-card-title">Recommended For You</h3>
-          <a href="search.html" class="dashboard-card-action">View All</a>
+          <h3 class="dashboard-card-title">Recent Messages</h3>
+          <a href="messages.html" class="dashboard-card-action">View All</a>
         </div>
         <div class="dashboard-card-body">
-          <div class="recommended-list">
-            <div class="recommended-item">
-              <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop" alt="James Miller" class="recommended-avatar">
-              <div class="recommended-info">
-                <div class="recommended-name">James Miller</div>
-                <div class="recommended-service">HVAC Technician</div>
-              </div>
-              <div class="recommended-rating">
-                <span>★</span> 4.9
-              </div>
-              <button class="recommended-btn" data-auth="hire" data-artisan-id="6" data-artisan-name="James Miller">Hire</button>
-            </div>
-            
-            <div class="recommended-item">
-              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop" alt="Maria Garcia" class="recommended-avatar">
-              <div class="recommended-info">
-                <div class="recommended-name">Maria Garcia</div>
-                <div class="recommended-service">Painter</div>
-              </div>
-              <div class="recommended-rating">
-                <span>★</span> 4.8
-              </div>
-              <button class="recommended-btn" data-auth="hire" data-artisan-id="7" data-artisan-name="Maria Garcia">Hire</button>
-            </div>
-            
-            <div class="recommended-item">
-              <img src="https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=100&h=100&fit=crop" alt="Tom Wilson" class="recommended-avatar">
-              <div class="recommended-info">
-                <div class="recommended-name">Tom Wilson</div>
-                <div class="recommended-service">Gardener</div>
-              </div>
-              <div class="recommended-rating">
-                <span>★</span> 4.7
-              </div>
-              <button class="recommended-btn" data-auth="hire" data-artisan-id="8" data-artisan-name="Tom Wilson">Hire</button>
-            </div>
-          </div>
+          <div class="recommended-list" id="recentMessagesList"></div>
         </div>
       </div>
     </main>

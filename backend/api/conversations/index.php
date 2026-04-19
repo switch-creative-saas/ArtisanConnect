@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../../lib/auth.php';
 require_once __DIR__ . '/../../lib/response.php';
-require_once __DIR__ . '/../../lib/db.php';
+require_once __DIR__ . '/../../db.php';
 
 // GET /backend/api/conversations/index.php
 $user = require_login();
@@ -59,7 +59,7 @@ $conversations = array_map(function ($r) {
     'avatar' => $r['artisan_avatar'],
     'service' => $r['artisan_service'],
     'status' => 'online',
-    'lastMessage' => $r['last_message'] ?: 'Say hi to start',
+    'lastMessage' => $r['last_message'] ?: '',
     'lastMessageTime' => format_chat_time($r['last_message_time']),
     'unreadCount' => 0,
     'messages' => [] // frontend can fetch messages separately

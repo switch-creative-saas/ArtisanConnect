@@ -62,10 +62,9 @@ async function initArtisanProfile() {
 
   if (hireBtn) {
     hireBtn.href = `hire-step-1.html?artisan=${artisan.id}`;
-    hireBtn.onclick = (e) => {
-      // Let the existing hire guard handle auth redirects.
-      e.stopPropagation();
-    };
+    hireBtn.setAttribute('data-auth', 'hire');
+    hireBtn.setAttribute('data-artisan-id', String(artisan.id));
+    hireBtn.setAttribute('data-artisan-name', artisan.name || 'Artisan');
   }
 
   // Works (from API)
@@ -101,9 +100,29 @@ async function initArtisanProfile() {
     `).join('');
   }
 
-  // Messaging: keep existing URL behavior for now.
+  // Messaging: ensure a conversation exists, then open it.
   if (messageBtn) {
-    messageBtn.addEventListener('click', () => {
+    messageBtn.addEventListener('click', async () => {
+      try {
+        const res = await fetch(`${apiBase}/conversations/start.php`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ artisanId: String(artisan.id) }).toString()
+        });
+        if (!res.ok) {
+          showToast && showToast('Could not open chat. Please try again.', 'warning');
+          return;
+        }
+        const data = await res.json();
+        if (data?.ok && data?.conversationId) {
+          window.location.href = `messages.html?chat=${encodeURIComponent(data.conversationId)}`;
+          return;
+        }
+      } catch (e) {
+        // fall back below
+      }
+      // fallback (old behavior)
       window.location.href = `messages.html?chat=${artisan.id}`;
     });
   }

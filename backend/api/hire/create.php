@@ -2,13 +2,14 @@
 require_once __DIR__ . '/../../lib/auth.php';
 require_once __DIR__ . '/../../lib/input.php';
 require_once __DIR__ . '/../../lib/response.php';
-require_once __DIR__ . '/../../lib/db.php';
+require_once __DIR__ . '/../../db.php';
+require_once __DIR__ . '/../../lib/simulation.php';
 
 // POST /backend/api/hire/create.php
-// Body JSON:
-// {
-//   artisanId, hours, needs, address, materialsEstimate, paymentMethod ('card'|'transfer')
-// }
+// Accepts JSON or form body, supporting both:
+// - artisanId / artisan_id
+// - needs / details
+// - hours, address, materialsEstimate, paymentMethod
 
 session_start_if_needed();
 
@@ -24,31 +25,25 @@ if (!$payload) $payload = $_POST ?? [];
 $artisanId = isset($payload['artisanId']) ? (int)$payload['artisanId'] : (isset($payload['artisan_id']) ? (int)$payload['artisan_id'] : 0);
 $hours = isset($payload['hours']) ? (int)$payload['hours'] : 0;
 $needs = isset($payload['needs']) ? trim((string)$payload['needs']) : '';
+$details = isset($payload['details']) ? trim((string)$payload['details']) : '';
 $address = isset($payload['address']) ? trim((string)$payload['address']) : '';
 $materialsEstimate = isset($payload['materialsEstimate']) ? (int)$payload['materialsEstimate'] : (isset($payload['materials_estimate']) ? (int)$payload['materials_estimate'] : 0);
 $paymentMethod = isset($payload['paymentMethod']) ? (string)$payload['paymentMethod'] : (isset($payload['payment_method']) ? (string)$payload['payment_method'] : 'card');
 $paymentMethod = $paymentMethod === 'transfer' ? 'transfer' : 'card';
 
-if ($artisanId <= 0) json_error('Missing or invalid artisanId', 400);
-if ($hours <= 0) json_error('Missing or invalid hours', 400);
-if ($needs === '') json_error('Missing needs', 400);
+$needs = $needs !== '' ? $needs : $details;
+if ($hours <= 0) $hours = 1;
+if ($needs === '') json_error('Missing needs/details', 400);
 
 $pdo = db();
 
-// Fetch artisan pricing details.
-$stmt = $pdo->prepare('SELECT id, name, category, hourly_rate FROM artisans WHERE id = :id LIMIT 1');
-$stmt->execute([':id' => $artisanId]);
-$artisan = $stmt->fetch();
-if (!$artisan) {
-  json_error('Artisan not found', 404);
-}
+// Fetch or create simulated artisan for the client-only phase.
+$artisan = ensure_simulated_artisan($pdo, $artisanId > 0 ? $artisanId : null);
 
 $stmt = $pdo->prepare('SELECT platform_fee, tax_rate FROM categories WHERE category_key = :cat LIMIT 1');
 $stmt->execute([':cat' => $artisan['category']]);
 $cat = $stmt->fetch();
-if (!$cat) {
-  json_error('Pricing category not configured', 500);
-}
+if (!$cat) $cat = ['platform_fee' => 5000, 'tax_rate' => 0.08];
 
 $serviceFee = (int)round($hours * (int)$artisan['hourly_rate']);
 $materialsFee = max(0, (int)$materialsEstimate);
@@ -61,7 +56,7 @@ $total = $taxable + $taxFee;
 
 // Create order.
 $paymentStatus = $paymentMethod === 'transfer' ? 'awaiting-confirmation' : 'pending';
-$status = 'created';
+$status = 'pending';
 
 $stmt = $pdo->prepare(
   'INSERT INTO orders
@@ -111,7 +106,6 @@ if ($conversationId <= 0) {
 }
 
 // Insert a notification message into the conversation.
-$userName = $user['name'] ?? 'A customer';
 $msgText = sprintf(
   'New hire request: "%s" · %d hour(s) · Total ₦%s.',
   $needs,
@@ -127,6 +121,18 @@ $stmt->execute([
   ':conversation_id' => $conversationId,
   ':sender_type' => 'system',
   ':content' => $msgText
+]);
+
+// Auto artisan acknowledgement (simulated behavior).
+$stmt = $pdo->prepare(
+  'INSERT INTO messages (conversation_id, sender_type, sender_id, content)
+   VALUES (:conversation_id, :sender_type, :sender_id, :content)'
+);
+$stmt->execute([
+  ':conversation_id' => $conversationId,
+  ':sender_type' => 'artisan',
+  ':sender_id' => (int)$artisan['id'],
+  ':content' => 'Hello, I have received your request.'
 ]);
 
 json_response([

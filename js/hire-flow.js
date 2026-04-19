@@ -350,6 +350,8 @@ function initPayment() {
           return;
         }
 
+        window.dispatchEvent(new Event('orders:changed'));
+        window.dispatchEvent(new Event('conversations:changed'));
         sessionStorage.removeItem(HIRE_FLOW_STORAGE_KEY);
         window.location.href = `messages.html?chat=${encodeURIComponent(data.conversationId)}`;
       } catch (e) {
@@ -399,6 +401,8 @@ function initPayment() {
           return;
         }
 
+        window.dispatchEvent(new Event('orders:changed'));
+        window.dispatchEvent(new Event('conversations:changed'));
         sessionStorage.removeItem(HIRE_FLOW_STORAGE_KEY);
         window.location.href = `messages.html?chat=${encodeURIComponent(data.conversationId)}`;
       } catch (e) {

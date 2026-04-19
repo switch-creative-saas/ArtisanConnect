@@ -2,23 +2,25 @@
 require_once __DIR__ . '/../../lib/auth.php';
 require_once __DIR__ . '/../../lib/response.php';
 require_once __DIR__ . '/../../lib/input.php';
-require_once __DIR__ . '/../../lib/db.php';
+require_once __DIR__ . '/../../db.php';
+require_once __DIR__ . '/../../lib/simulation.php';
 
 // Conversation messages
 // GET  /backend/api/conversations/messages.php?id=<conversationId>
-// POST /backend/api/conversations/messages.php?id=<conversationId>
+// POST /backend/api/conversations/messages.php?id=<conversationId> or body { conversationId, content }
 
 $user = require_login();
 $pdo = db();
 
 $conversationId = param_int('id');
-if ($conversationId === null) json_error('Missing required query param: id', 400);
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-  // Ensure conversation belongs to this user
-  $stmt = $pdo->prepare('SELECT id FROM conversations WHERE id = :id AND user_id = :uid LIMIT 1');
+  if ($conversationId === null) json_error('Missing required query param: id', 400);
+  // Ensure conversation belongs to this user and get artisan id for simulation reply.
+  $stmt = $pdo->prepare('SELECT id, artisan_id FROM conversations WHERE id = :id AND user_id = :uid LIMIT 1');
   $stmt->execute([':id' => $conversationId, ':uid' => (int)$user['id']]);
-  if (!$stmt->fetch()) json_error('Conversation not found', 404);
+  $conv = $stmt->fetch();
+  if (!$conv) json_error('Conversation not found', 404);
 
   $stmt = $pdo->prepare(
     'SELECT id, sender_type, content, created_at
@@ -59,6 +61,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $payload = body_json();
   if (!$payload) $payload = $_POST ?? [];
 
+  if ($conversationId === null) {
+    $conversationId = isset($payload['conversationId']) ? (int)$payload['conversationId'] : (isset($payload['id']) ? (int)$payload['id'] : null);
+  }
+  if ($conversationId === null) json_error('Missing conversation id', 400);
+
   $content = isset($payload['content']) ? trim((string)$payload['content']) : '';
   if ($content === '') json_error('Missing message content', 400);
 
@@ -78,6 +85,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ':content' => $content
   ]);
 
+  // Simulated artisan auto-reply
+  $replyText = simulated_artisan_reply_text();
+  $stmt = $pdo->prepare(
+    'INSERT INTO messages (conversation_id, sender_type, sender_id, content)
+     VALUES (:cid, :sender_type, :sender_id, :content)'
+  );
+  $stmt->execute([
+    ':cid' => (int)$conversationId,
+    ':sender_type' => 'artisan',
+    ':sender_id' => (int)$conv['artisan_id'],
+    ':content' => $replyText
+  ]);
+
   $messageId = (int)$pdo->lastInsertId();
   $stmt = $pdo->prepare(
     'SELECT id, sender_type, content, created_at
@@ -94,7 +114,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       'text' => $m['content'],
       'time' => date('H:i'),
       'status' => 'sent'
-    ]
+    ],
+    'autoReply' => [
+      'sender' => 'them',
+      'text' => $replyText,
+      'time' => date('H:i'),
+      'status' => 'sent'
+    ],
   ], 201);
 }
 
