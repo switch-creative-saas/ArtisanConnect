@@ -11,6 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/order-history.css">
 </head>
 <body>
   <div class="toast-container" id="toastContainer"></div>
@@ -69,57 +70,74 @@
       </nav>
     </aside>
 
-    <main class="dashboard-main">
-      <div class="dashboard-header">
-        <div class="dashboard-title">
+    <main class="dashboard-main" style="padding-top: calc(var(--space-xl) + 66px);">
+      <div class="order-history-page">
+        <div class="history-header">
           <h1>Order History</h1>
-          <p>Completed services and past requests</p>
+          <div class="history-stats" id="historyStats">
+            <div class="stat-card">
+              <h3>Total Orders</h3>
+              <p class="stat-value" id="totalOrders">0</p>
+            </div>
+            <div class="stat-card">
+              <h3>Total Spent</h3>
+              <p class="stat-value" id="totalSpent">₦0</p>
+            </div>
+            <div class="stat-card">
+              <h3>Completed</h3>
+              <p class="stat-value" id="completedOrders">0</p>
+            </div>
+          </div>
         </div>
-        <div class="dashboard-actions">
-          <a href="orders.html" class="btn btn-secondary">Back to Orders</a>
-        </div>
-      </div>
 
-      <div class="dashboard-card">
-        <div class="dashboard-card-header">
-          <h3 class="dashboard-card-title">Completed</h3>
-          <a href="search.html" class="dashboard-card-action">Hire Again</a>
+        <div class="history-controls">
+          <div class="search-filter">
+            <input type="text" id="searchInput" placeholder="Search orders..." class="search-input">
+            <select id="statusFilter" class="filter-select">
+              <option value="">All Status</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+              <option value="in_progress">In Progress</option>
+            </select>
+            <select id="dateFilter" class="filter-select">
+              <option value="">All Time</option>
+              <option value="7">Last 7 Days</option>
+              <option value="30">Last 30 Days</option>
+              <option value="90">Last 90 Days</option>
+            </select>
+          </div>
+          <div class="export-controls">
+            <button class="btn btn-secondary" onclick="exportHistory()">Export CSV</button>
+          </div>
         </div>
-        <div class="dashboard-card-body">
-          <table class="orders-table">
-            <thead>
-              <tr>
-                <th>Order</th>
-                <th>Service</th>
-                <th>Artisan</th>
-                <th>Amount</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>#ORD-2024-000991</td>
-                <td>Furniture Assembly</td>
-                <td>Robert Williams</td>
-                <td class="order-amount">₦120,000</td>
-                <td>Jan 12, 2024</td>
-              </tr>
-              <tr>
-                <td>#ORD-2023-009812</td>
-                <td>Deep Cleaning</td>
-                <td>Lisa Anderson</td>
-                <td class="order-amount">₦75,000</td>
-                <td>Dec 28, 2023</td>
-              </tr>
-              <tr>
-                <td>#ORD-2023-009224</td>
-                <td>Painting</td>
-                <td>Maria Garcia</td>
-                <td class="order-amount">₦140,000</td>
-                <td>Dec 05, 2023</td>
-              </tr>
-            </tbody>
-          </table>
+
+        <div class="history-container" id="historyContainer">
+          <div class="loading-spinner" id="loadingSpinner">
+            <div class="spinner"></div>
+            <p>Loading order history...</p>
+          </div>
+          
+          <div class="history-table" id="historyTable" style="display: none;">
+            <div class="table-header">
+              <div class="header-cell">Order ID</div>
+              <div class="header-cell">Artisan</div>
+              <div class="header-cell">Service</div>
+              <div class="header-cell">Amount</div>
+              <div class="header-cell">Status</div>
+              <div class="header-cell">Date</div>
+              <div class="header-cell">Actions</div>
+            </div>
+            <div class="table-body" id="tableBody">
+              <!-- Orders will be dynamically loaded here -->
+            </div>
+          </div>
+
+          <div class="empty-state" id="emptyState" style="display: none;">
+            <div class="empty-state-icon">📋</div>
+            <h3>No order history</h3>
+            <p>You haven't completed any orders yet. Start by finding and hiring an artisan!</p>
+            <a href="search.html" class="btn btn-primary">Find Artisans</a>
+          </div>
         </div>
       </div>
     </main>
@@ -127,14 +145,6 @@
 
   <script src="../js/main.js"></script>
   <script src="../js/dashboard.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const user = getCurrentUser?.();
-      if (user) {
-        const el = document.getElementById('sidebarUserName');
-        if (el) el.textContent = `${user.firstName || 'User'} ${user.lastName || ''}`.trim();
-      }
-    });
-  </script>
+  <script src="../js/order-history.js"></script>
 </body>
 </html>

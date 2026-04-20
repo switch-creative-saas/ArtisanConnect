@@ -17,8 +17,15 @@ function renderStars(rating) {
   return stars || '—';
 }
 
+function formatReviewDate(createdAt) {
+  if (!createdAt) return '';
+  const dt = new Date(createdAt);
+  if (!Number.isFinite(dt.getTime())) return '';
+  return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
 async function initArtisanProfile() {
-  const artisanIdRaw = getQueryParam('artisan');
+  const artisanIdRaw = getQueryParam('artisan') || getQueryParam('id');
   const artisanId = Number(artisanIdRaw);
   if (!Number.isFinite(artisanId)) return;
 
@@ -32,9 +39,21 @@ async function initArtisanProfile() {
     return await res.json();
   }
 
-  const show = await fetchJson(`${apiBase}/artisans/show.php?id=${encodeURIComponent(artisanId)}`);
-  if (!show?.ok || !show?.artisan) return;
-  const artisan = show.artisan;
+  let artisan = null;
+  let works = [];
+  let reviews = [];
+
+  // Primary path: single endpoint with artisan + works + reviews.
+  const profile = await fetchJson(`${apiBase}/artisans/profile.php?id=${encodeURIComponent(artisanId)}`);
+  if (profile?.ok && profile?.artisan) {
+    artisan = profile.artisan;
+    works = Array.isArray(profile.artisan.works) ? profile.artisan.works : [];
+    reviews = Array.isArray(profile.artisan.reviews) ? profile.artisan.reviews : [];
+  } else if (Array.isArray(window.artisansData)) {
+    // Frontend fallback when backend is unavailable.
+    artisan = window.artisansData.find(a => Number(a.id) === artisanId) || null;
+  }
+  if (!artisan) return;
 
   const cover = document.getElementById('artisanProfileCover');
   const avatar = document.getElementById('artisanProfileAvatar');
@@ -67,10 +86,14 @@ async function initArtisanProfile() {
     hireBtn.setAttribute('data-artisan-name', artisan.name || 'Artisan');
   }
 
-  // Works (from API)
+  // Works
   if (worksGrid) {
-    const worksRes = await fetchJson(`${apiBase}/artisans/works.php?id=${encodeURIComponent(artisanId)}`);
-    const works = worksRes?.ok ? worksRes.works : [];
+    if ((!works || works.length === 0) && artisan.image) {
+      works = [
+        { title: `${artisan.name || 'Artisan'} - Featured Work`, image: artisan.image },
+        { title: `${artisan.service || 'Service'} Sample Project`, image: artisan.image }
+      ];
+    }
     worksGrid.innerHTML = (works || [])
       .map(w => `
         <div class="works-card">
@@ -81,14 +104,41 @@ async function initArtisanProfile() {
           </div>
         </div>
       `).join('');
+
+    if (!worksGrid.innerHTML.trim()) {
+      worksGrid.innerHTML = `
+        <div class="works-card">
+          <img src="${artisan.image || artisan.avatar || ''}" alt="Work placeholder">
+          <div class="works-card-body">
+            <div class="works-card-title">Work gallery coming soon</div>
+            <div class="works-card-desc"></div>
+          </div>
+        </div>
+      `;
+    }
   }
 
-  // Reviews (from API)
+  // Reviews
   if (reviewsGrid) {
-    const reviewsRes = await fetchJson(`${apiBase}/artisans/reviews.php?id=${encodeURIComponent(artisanId)}`);
-    const reviews = reviewsRes?.ok ? reviewsRes.reviews : [];
+    let normalizedReviews = (reviews || []).map(r => ({
+      name: r.name || r.reviewerName || 'Anonymous',
+      rating: Number(r.rating || 0),
+      text: r.text || '',
+      date: r.date || formatReviewDate(r.createdAt)
+    }));
 
-    reviewsGrid.innerHTML = (reviews || []).map(r => `
+    if (!normalizedReviews || normalizedReviews.length === 0) {
+      normalizedReviews = [
+        {
+          name: 'ArtisanConnect',
+          rating: artisan.rating || 5,
+          text: 'This artisan profile is ready. Customer reviews will appear here after completed jobs.',
+          date: 'Today'
+        }
+      ];
+    }
+
+    reviewsGrid.innerHTML = normalizedReviews.map(r => `
       <div class="review-card">
         <div class="review-head">
           <div class="review-name">${r.name || ''}</div>
@@ -103,27 +153,38 @@ async function initArtisanProfile() {
   // Messaging: ensure a conversation exists, then open it.
   if (messageBtn) {
     messageBtn.addEventListener('click', async () => {
+      if (!isLoggedIn()) {
+        requireAuth({
+          mode: 'login',
+          redirectTo: window.location.href
+        });
+        return;
+      }
+
       try {
         const res = await fetch(`${apiBase}/conversations/start.php`, {
           method: 'POST',
           credentials: 'include',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({ artisanId: String(artisan.id) }).toString()
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ artisanId: artisan.id })
         });
+        
         if (!res.ok) {
           showToast && showToast('Could not open chat. Please try again.', 'warning');
           return;
         }
+        
         const data = await res.json();
         if (data?.ok && data?.conversationId) {
           window.location.href = `messages.html?chat=${encodeURIComponent(data.conversationId)}`;
           return;
+        } else {
+          showToast && showToast('Failed to start conversation', 'error');
         }
       } catch (e) {
-        // fall back below
+        console.error('Error starting conversation:', e);
+        showToast && showToast('Network error. Please try again.', 'error');
       }
-      // fallback (old behavior)
-      window.location.href = `messages.html?chat=${artisan.id}`;
     });
   }
 }

@@ -32,6 +32,14 @@ function setDraft(draft) {
   sessionStorage.setItem(HIRE_FLOW_STORAGE_KEY, JSON.stringify(draft));
 }
 
+function setDraftSafe(draft) {
+  try {
+    setDraft(draft);
+  } catch (e) {
+    // ignore storage errors
+  }
+}
+
 function buildInitialDraft() {
   const params = new URLSearchParams(window.location.search);
   const artisanId = Number(params.get('artisan')) || 2;
@@ -41,6 +49,7 @@ function buildInitialDraft() {
     artisan,
     needs: '',
     address: '',
+    location: null, // { lat, lng, placeId?, formattedAddress? }
     hours: 2,
     materialsEstimate: artisan.materialsFee,
     paymentMethod: 'card'
@@ -81,6 +90,153 @@ function fillArtisanSummary(draft) {
   if (service) service.textContent = `${draft.artisan.service} · ${formatNaira(draft.artisan.hourlyRate)}/hr`;
 }
 
+function setStep1AddressHelp(message, type = 'info') {
+  const help = document.getElementById('hireAddressHelp');
+  if (!help) return;
+  help.style.display = message ? 'block' : 'none';
+  help.textContent = message || '';
+  help.style.borderColor =
+    type === 'warning' ? 'rgba(245, 158, 11, 0.35)' :
+    type === 'error' ? 'rgba(239, 68, 68, 0.35)' :
+    'rgba(255, 255, 255, 0.08)';
+}
+
+function initStep1GoogleMapsAddressPicker() {
+  const addressInput = document.getElementById('jobAddress');
+  const mapEl = document.getElementById('hireAddressMap');
+  const locateBtn = document.getElementById('useMyLocationBtn');
+
+  if (!addressInput) return;
+
+  const hasKey = typeof window.hasGoogleMapsKey === 'function'
+    ? window.hasGoogleMapsKey()
+    : !!String(window.GOOGLE_MAPS_API_KEY || '').trim();
+
+  if (!hasKey) {
+    setStep1AddressHelp('Tip: add a Google Maps API key in js/maps-config.js to enable address autocomplete + map preview.', 'warning');
+    locateBtn?.addEventListener('click', () => {
+      showToast('Google Maps key missing. Add it in js/maps-config.js first.', 'warning');
+    });
+    return;
+  }
+
+  const initialCenter = { lat: 6.5244, lng: 3.3792 }; // Lagos fallback
+
+  function showMap() {
+    if (!mapEl) return;
+    mapEl.style.display = 'block';
+  }
+
+  function updateDraft(next) {
+    const updated = { ...ensureDraft(), ...next };
+    setDraftSafe(updated);
+  }
+
+  function applyLatLngToMap(map, marker, latLng) {
+    marker.setPosition(latLng);
+    map.setCenter(latLng);
+    map.setZoom(15);
+  }
+
+  window.loadGoogleMaps?.({ libraries: ['places'] })
+    .then(() => {
+      setStep1AddressHelp('', 'info');
+
+      const draft = ensureDraft();
+      const savedLatLng = draft.location?.lat && draft.location?.lng
+        ? { lat: Number(draft.location.lat), lng: Number(draft.location.lng) }
+        : null;
+
+      const map = mapEl ? new google.maps.Map(mapEl, {
+        center: savedLatLng || initialCenter,
+        zoom: savedLatLng ? 15 : 11,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false
+      }) : null;
+
+      const marker = map ? new google.maps.Marker({
+        map,
+        position: savedLatLng || initialCenter
+      }) : null;
+
+      if (map) showMap();
+
+      const autocomplete = new google.maps.places.Autocomplete(addressInput, {
+        fields: ['formatted_address', 'geometry', 'place_id', 'name'],
+        types: ['geocode']
+      });
+
+      autocomplete.addListener('place_changed', () => {
+        const place = autocomplete.getPlace();
+        const formatted = place?.formatted_address || addressInput.value.trim();
+        const loc = place?.geometry?.location;
+
+        if (!loc) {
+          setStep1AddressHelp('Select an address from the dropdown to pin it on the map.', 'warning');
+          updateDraft({ address: formatted, location: null });
+          return;
+        }
+
+        const lat = loc.lat();
+        const lng = loc.lng();
+        addressInput.value = formatted;
+
+        updateDraft({
+          address: formatted,
+          location: { lat, lng, placeId: place.place_id || null, formattedAddress: formatted }
+        });
+
+        if (map && marker) applyLatLngToMap(map, marker, { lat, lng });
+        if (map) showMap();
+      });
+
+      locateBtn?.addEventListener('click', () => {
+        if (!navigator.geolocation) {
+          showToast('Geolocation is not supported in this browser.', 'warning');
+          return;
+        }
+
+        locateBtn.disabled = true;
+        const prevText = locateBtn.textContent;
+        locateBtn.textContent = 'Locating…';
+
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+          try {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+
+            const geocoder = new google.maps.Geocoder();
+            const { results } = await geocoder.geocode({ location: { lat, lng } });
+            const formatted = results?.[0]?.formatted_address || `Lat ${lat.toFixed(5)}, Lng ${lng.toFixed(5)}`;
+
+            addressInput.value = formatted;
+            updateDraft({
+              address: formatted,
+              location: { lat, lng, placeId: results?.[0]?.place_id || null, formattedAddress: formatted }
+            });
+
+            if (map && marker) applyLatLngToMap(map, marker, { lat, lng });
+            if (map) showMap();
+            showToast('Location updated', 'success');
+          } catch (e) {
+            showToast('Could not resolve your location to an address.', 'warning');
+          } finally {
+            locateBtn.disabled = false;
+            locateBtn.textContent = prevText;
+          }
+        }, () => {
+          locateBtn.disabled = false;
+          locateBtn.textContent = prevText;
+          showToast('Location permission denied.', 'warning');
+        }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 30000 });
+      });
+    })
+    .catch(() => {
+      setStep1AddressHelp('Map could not load. Double-check your Google Maps API key and enabled APIs.', 'warning');
+    });
+}
+
 function initStep1() {
   const draft = ensureDraft();
   fillArtisanSummary(draft);
@@ -88,16 +244,21 @@ function initStep1() {
   const address = document.getElementById('jobAddress');
   if (needs) needs.value = draft.needs || '';
   if (address) address.value = draft.address || '';
+  initStep1GoogleMapsAddressPicker();
 
   const nextBtn = document.getElementById('nextBtn');
   if (nextBtn) {
     nextBtn.addEventListener('click', () => {
-      const updated = { ...draft, needs: needs.value.trim(), address: address.value.trim() };
+      const updated = { ...ensureDraft(), needs: needs.value.trim(), address: address.value.trim() };
       if (!updated.needs) {
         showToast('Please describe your needs first', 'warning');
         return;
       }
-      setDraft(updated);
+      if (!updated.address) {
+        showToast('Please enter an address', 'warning');
+        return;
+      }
+      setDraftSafe(updated);
       window.location.href = 'hire-step-2.html';
     });
   }

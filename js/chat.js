@@ -10,6 +10,42 @@ let conversationsData = [];
 
 let activeConversationId = null;
 let isTyping = false;
+let pollingInterval = null;
+let lastMessageTimestamp = {};
+const WELCOME_CHAT_ID = -1;
+
+function getWelcomeConversation() {
+  return {
+    id: WELCOME_CHAT_ID,
+    name: 'System / Support',
+    avatar: '../assets/app-logo.png',
+    status: 'online',
+    isSystem: true,
+    isPinned: true,
+    icon: '🛟',
+    unreadCount: 0,
+    lastMessage: 'Welcome to ArtisanConnect',
+    lastMessageTime: 'Now',
+    messages: [
+      {
+        id: `welcome-${Date.now()}`,
+        sender: 'them',
+        text: 'Welcome to ArtisanConnect! You can message artisans here after you start a hire request.',
+        time: 'Today, Now'
+      }
+    ]
+  };
+}
+
+function ensureWelcomeConversation() {
+  const existing = conversationsData.find(c => Number(c.id) === WELCOME_CHAT_ID);
+  if (existing) return;
+  conversationsData = [getWelcomeConversation(), ...conversationsData];
+}
+
+function isSystemConversation(chat) {
+  return Number(chat?.id) === WELCOME_CHAT_ID || !!chat?.isSystem;
+}
 
 // ============================================
 // INITIALIZE CHAT PAGE
@@ -34,13 +70,18 @@ async function initChatPage() {
     // If the backend isn't running, keep mock/fallback `conversationsData`.
   }
 
+  ensureWelcomeConversation();
   renderChatList();
   
   // Check for URL param to open specific chat
   const urlParams = new URLSearchParams(window.location.search);
-  const chatId = urlParams.get('chat');
-  if (chatId) {
-    openConversation(parseInt(chatId));
+  const chatIdRaw = urlParams.get('chat');
+  const chatId = chatIdRaw ? Number(chatIdRaw) : null;
+  if (chatId && conversationsData.some(c => Number(c.id) === chatId)) {
+    openConversation(chatId);
+  } else {
+    // Open default welcome chat.
+    openConversation(WELCOME_CHAT_ID);
   }
 
   // Consume pending order notification (sent from hire checkout)
@@ -84,12 +125,13 @@ function renderChatList() {
   if (!chatList) return;
   
   chatList.innerHTML = conversationsData.map(chat => `
-    <div class="chat-item ${chat.unreadCount > 0 ? 'unread' : ''} ${chat.id === activeConversationId ? 'active' : ''}" 
+    <div class="chat-item ${chat.unreadCount > 0 ? 'unread' : ''} ${chat.id === activeConversationId ? 'active' : ''} ${isSystemConversation(chat) ? 'chat-item-system' : ''}" 
          onclick="openConversation(${chat.id})"
          data-name="${chat.name.toLowerCase()}">
       <div class="chat-item-avatar">
         <img src="${chat.avatar}" alt="${chat.name}">
         <span class="chat-item-status ${chat.status}"></span>
+        ${isSystemConversation(chat) ? `<span class="chat-system-icon">${chat.icon || '🛟'}</span>` : ''}
       </div>
       <div class="chat-item-content">
         <div class="chat-item-header">
@@ -98,6 +140,7 @@ function renderChatList() {
         </div>
         <div class="chat-item-preview">
           <span class="chat-item-message ${chat.unreadCount > 0 ? 'unread' : ''}">${chat.lastMessage}</span>
+          ${chat.isPinned ? `<span class="chat-pin-badge" title="Pinned">Pinned</span>` : ''}
           ${chat.unreadCount > 0 ? `<span class="chat-item-badge">${chat.unreadCount}</span>` : ''}
         </div>
       </div>
@@ -110,6 +153,15 @@ function renderChatList() {
 // ============================================
 
 async function openConversation(chatId) {
+  // Stop polling previous conversation
+  stopPolling();
+  
+  // Hide welcome message if it exists
+  const welcomeMessage = document.querySelector('.welcome-message');
+  if (welcomeMessage) {
+    welcomeMessage.remove();
+  }
+  
   activeConversationId = chatId;
   const conversation = conversationsData.find(c => c.id === chatId);
   if (!conversation) return;
@@ -123,34 +175,51 @@ async function openConversation(chatId) {
   // Update header
   document.getElementById('activeChatAvatar').src = conversation.avatar;
   document.getElementById('activeChatAvatar').alt = conversation.name;
-  document.getElementById('activeChatName').textContent = conversation.name;
+  document.getElementById('activeChatName').innerHTML = isSystemConversation(conversation)
+    ? `${escapeHtml(conversation.name)} <span class="chat-pin-badge header">Pinned</span>`
+    : escapeHtml(conversation.name);
   document.getElementById('activeChatStatus').className = `chat-header-status ${conversation.status}`;
-  document.getElementById('activeChatStatusText').textContent = conversation.status === 'online' ? 'Online' : 
-                                                               conversation.status === 'away' ? 'Away' : 'Offline';
+  document.getElementById('activeChatStatusText').textContent = isSystemConversation(conversation)
+    ? 'System channel • Support updates'
+    : (conversation.status === 'online' ? 'Online' : conversation.status === 'away' ? 'Away' : 'Offline');
   
   // Update typing indicator avatar
   document.getElementById('typingAvatar').src = conversation.avatar;
   
   // Load messages from backend before rendering.
-  try {
-    const apiBase = typeof getApiBaseUrl === 'function'
-      ? getApiBaseUrl()
-      : `${typeof getSiteRootPrefix === 'function' ? getSiteRootPrefix() : ''}backend/api`;
-    const res = await fetch(`${apiBase}/conversations/messages.php?id=${encodeURIComponent(chatId)}`, {
-      credentials: 'include'
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if (data?.ok && Array.isArray(data?.messages)) {
-        conversation.messages = data.messages;
+  if (chatId !== WELCOME_CHAT_ID) {
+    try {
+      const apiBase = typeof getApiBaseUrl === 'function'
+        ? getApiBaseUrl()
+        : `${typeof getSiteRootPrefix === 'function' ? getSiteRootPrefix() : ''}backend/api`;
+      const res = await fetch(`${apiBase}/conversations/messages.php?id=${encodeURIComponent(chatId)}`, {
+        credentials: 'include'
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.ok && Array.isArray(data?.messages)) {
+          conversation.messages = data.messages;
+          // Store timestamp of last message for polling
+          if (data.messages.length > 0) {
+            const lastMessage = data.messages[data.messages.length - 1];
+            lastMessageTimestamp[chatId] = lastMessage.id || Date.now();
+          }
+        }
       }
+    } catch (e) {
+      // Ignore and render whatever messages we already have.
     }
-  } catch (e) {
-    // Ignore and render whatever messages we already have.
   }
 
   // Render messages
   renderMessages(conversation);
+  
+  // Start real-time polling for real conversations only.
+  if (chatId !== WELCOME_CHAT_ID) {
+    startPolling(chatId);
+  } else {
+    document.getElementById('chatInput').style.display = 'none';
+  }
   
   // Mark as read
   conversation.unreadCount = 0;
@@ -216,6 +285,10 @@ async function sendMessage() {
   const text = input.value.trim();
   
   if (!text || !activeConversationId) return;
+  if (activeConversationId === WELCOME_CHAT_ID) {
+    showToast('Start a conversation with an artisan to send messages.', 'info');
+    return;
+  }
   
   const conversation = conversationsData.find(c => c.id === activeConversationId);
   if (!conversation) return;
@@ -342,6 +415,114 @@ function startNewConversation() {
   if (search) {
     search.focus();
     showToast('Search for an artisan to start a new conversation', 'info');
+  }
+}
+
+// ============================================
+// REAL-TIME POLLING
+// ============================================
+
+function startPolling(conversationId) {
+  // Clear any existing polling
+  if (pollingInterval) {
+    clearInterval(pollingInterval);
+  }
+  
+  // Poll every 3 seconds for new messages
+  pollingInterval = setInterval(async () => {
+    await pollForNewMessages(conversationId);
+  }, 3000);
+}
+
+async function pollForNewMessages(conversationId) {
+  try {
+    const apiBase = typeof getApiBaseUrl === 'function'
+      ? getApiBaseUrl()
+      : `${typeof getSiteRootPrefix === 'function' ? getSiteRootPrefix() : ''}backend/api`;
+    
+    const res = await fetch(`${apiBase}/conversations/messages.php?id=${encodeURIComponent(conversationId)}`, {
+      credentials: 'include'
+    });
+    
+    if (!res.ok) return;
+    
+    const data = await res.json();
+    if (!data?.ok || !Array.isArray(data?.messages)) return;
+    
+    const conversation = conversationsData.find(c => c.id === conversationId);
+    if (!conversation) return;
+    
+    // Check if we have new messages
+    const currentLastId = lastMessageTimestamp[conversationId] || 0;
+    const newMessages = data.messages.filter(msg => (msg.id || Date.now()) > currentLastId);
+    
+    if (newMessages.length > 0) {
+      conversation.messages = data.messages;
+      const lastMessage = data.messages[data.messages.length - 1];
+      lastMessageTimestamp[conversationId] = lastMessage.id || Date.now();
+      
+      // Only re-render if this is the active conversation
+      if (activeConversationId === conversationId) {
+        renderMessages(conversation);
+        scrollToBottom();
+      } else {
+        // Update conversation list with new message
+        conversation.lastMessage = lastMessage.text;
+        conversation.lastMessageTime = lastMessage.time;
+        conversation.unreadCount = (conversation.unreadCount || 0) + newMessages.filter(m => m.sender === 'them').length;
+        renderChatList();
+      }
+    }
+  } catch (error) {
+    // Silently handle polling errors
+    console.error('Polling error:', error);
+  }
+}
+
+function stopPolling() {
+  if (pollingInterval) {
+    clearInterval(pollingInterval);
+    pollingInterval = null;
+  }
+}
+
+// ============================================
+// WELCOME MESSAGE
+// ============================================
+
+function showWelcomeMessage() {
+  openConversation(WELCOME_CHAT_ID);
+  return;
+
+  // Hide chat elements and show welcome
+  document.getElementById('chatEmpty').style.display = 'none';
+  document.getElementById('chatHeader').style.display = 'none';
+  document.getElementById('chatMessages').style.display = 'none';
+  document.getElementById('chatInput').style.display = 'none';
+  
+  // Create welcome message container
+  const chatMain = document.querySelector('.chat-main');
+  if (chatMain) {
+    const existingWelcome = chatMain.querySelector('.welcome-message');
+    if (existingWelcome) {
+      existingWelcome.remove();
+    }
+    
+    const welcomeDiv = document.createElement('div');
+    welcomeDiv.className = 'welcome-message';
+    welcomeDiv.innerHTML = `
+      <div style="text-align: center; padding: 60px 20px; color: var(--text-secondary);">
+        <div style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;">💬</div>
+        <h2 style="color: var(--text); margin-bottom: 16px;">Welcome to Messages</h2>
+        <p style="font-size: 1.1rem; line-height: 1.6; max-width: 400px; margin: 0 auto;">
+          Start a conversation with an artisan by browsing artisans and clicking "Message", or complete a hire request to begin chatting about your project.
+        </p>
+        <div style="margin-top: 30px;">
+          <a href="search.html" class="btn btn-primary" style="text-decoration: none;">Find Artisans</a>
+        </div>
+      </div>
+    `;
+    chatMain.appendChild(welcomeDiv);
   }
 }
 

@@ -96,6 +96,47 @@
   resize: vertical;
 }
 
+.hire-address-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.hire-locate-btn {
+  padding: 0.75rem 0.9rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(15, 23, 42, 0.45);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.hire-locate-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.hire-address-help {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  background: rgba(15, 23, 42, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hire-address-map {
+  margin-top: 10px;
+  height: 220px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 .hire-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -202,5 +243,15 @@
 @media (max-width: 768px) {
   .hire-grid-2 {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .hire-address-row {
+    grid-template-columns: 1fr;
+  }
+  .hire-locate-btn {
+    width: 100%;
+    justify-content: center;
   }
 }

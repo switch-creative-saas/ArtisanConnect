@@ -11,6 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/orders.css">
 </head>
 <body>
   <div class="toast-container" id="toastContainer"></div>
@@ -82,55 +83,23 @@
         </div>
         <div class="dashboard-actions">
           <a href="search.html" class="btn btn-primary">Hire an artisan</a>
-        </div>
-      </div>
 
-      <div class="dashboard-card">
-        <div class="dashboard-card-header">
-          <h3 class="dashboard-card-title">Active Orders</h3>
-          <a href="order-history.html" class="dashboard-card-action">View History</a>
-        </div>
-        <div class="dashboard-card-body">
-          <table class="orders-table">
-            <thead>
-              <tr>
-                <th>Order</th>
-                <th>Service</th>
-                <th>Status</th>
-                <th>Amount</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>#ORD-2024-001234</td>
-                <td>Electrical Repair</td>
-                <td><span class="order-status in-progress">In Progress</span></td>
-                <td class="order-amount">₦183,600</td>
-                <td style="text-align:right;">
-                  <a class="btn btn-ghost btn-sm" href="track-order.html">Track</a>
-                </td>
-              </tr>
-              <tr>
-                <td>#ORD-2024-001118</td>
-                <td>Plumbing Fix</td>
-                <td><span class="order-status pending">Pending</span></td>
-                <td class="order-amount">₦85,000</td>
-                <td style="text-align:right;">
-                  <a class="btn btn-ghost btn-sm" href="track-order.html">Track</a>
-                </td>
-              </tr>
-              <tr>
-                <td>#ORD-2024-000991</td>
-                <td>Furniture Assembly</td>
-                <td><span class="order-status completed">Completed</span></td>
-                <td class="order-amount">₦120,000</td>
-                <td style="text-align:right;">
-                  <a class="btn btn-ghost btn-sm" href="order-history.html">Details</a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="orders-container" id="ordersContainer">
+          <div class="loading-spinner" id="loadingSpinner">
+            <div class="spinner"></div>
+            <p>Loading your orders...</p>
+          </div>
+          
+          <div class="orders-grid" id="ordersGrid" style="display: none;">
+            <!-- Orders will be dynamically loaded here -->
+          </div>
+
+          <div class="empty-state" id="emptyState" style="display: none;">
+            <div class="empty-state-icon">📋</div>
+            <h3>No orders found</h3>
+            <p>You haven't placed any orders yet. Start by finding and hiring an artisan!</p>
+            <a href="search.html" class="btn btn-primary">Find Artisans</a>
+          </div>
         </div>
       </div>
     </main>
@@ -138,14 +107,7 @@
 
   <script src="../js/main.js"></script>
   <script src="../js/dashboard.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const user = getCurrentUser?.();
-      if (user) {
-        const el = document.getElementById('sidebarUserName');
-        if (el) el.textContent = `${user.firstName || 'User'} ${user.lastName || ''}`.trim();
-      }
-    });
+  <script src="../js/orders.js"></script>
   </script>
 </body>
 </html>

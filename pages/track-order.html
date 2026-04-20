@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/styles.css">
-  <link rel="stylesheet" href="../css/tracking.css">
   <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/track-order.css">
 </head>
 <body>
   <div class="toast-container" id="toastContainer"></div>
@@ -67,87 +67,48 @@
       </nav>
     </aside>
 
-    <main class="dashboard-main">
-      <div class="tracking-page">
-        <div class="tracking-container">
-      <div class="tracking-header">
-        <h1 class="tracking-title">Track Your Order</h1>
-        <p class="tracking-subtitle">Stay updated on your service progress</p>
-      </div>
-
-      <div class="tracking-card">
-        <div class="tracking-card-header">
-          <div class="tracking-order-info">
-            <h3>Order #ORD-2024-001234</h3>
-            <p>Placed on January 15, 2024 at 10:30 AM</p>
+    <main class="dashboard-main" style="padding-top: calc(var(--space-xl) + 66px);">
+      <div class="track-order-page">
+        <div class="track-header">
+          <h1>Track Order</h1>
+          <div class="order-search">
+            <input type="text" id="orderSearchInput" placeholder="Enter order ID (e.g., ORD-123456)" class="order-input">
+            <button class="btn btn-primary" onclick="searchOrder()">Search</button>
           </div>
-          <span class="tracking-status-badge in-progress">In Progress</span>
         </div>
 
-        <div class="tracking-progress">
-          <div class="progress-bar-container">
-            <div class="progress-bar">
-              <div class="progress-fill" id="progressFill" style="width: 50%;"></div>
-            </div>
-            <div class="progress-text">
-              <span class="progress-percentage" id="progressPercentage">50%</span>
-              <span class="progress-label">Complete</span>
-            </div>
+        <div class="track-container" id="trackContainer">
+          <div class="loading-spinner" id="loadingSpinner">
+            <div class="spinner"></div>
+            <p>Tracking your order...</p>
           </div>
 
-          <div class="tracking-timeline" id="trackingTimeline"></div>
+          <div class="order-details" id="orderDetails" style="display: none;">
+            <!-- Order details will be loaded here -->
+          </div>
 
-          <div class="artisan-info-card">
-            <div class="artisan-info-avatar">
-              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop" alt="David Chen">
-              <span class="artisan-info-status"></span>
-            </div>
-            <div class="artisan-info-details">
-              <h4>David Chen</h4>
-              <p>Electrician • 1.8 miles away</p>
-              <div class="artisan-info-rating">
-                <span>★</span> 5.0 (96 reviews)
-              </div>
-            </div>
-            <div class="artisan-info-actions">
-              <button class="artisan-info-btn" onclick="location.href='messages.html?chat=2'">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                </svg>
-                Message
-              </button>
-              <button class="artisan-info-btn" onclick="showToast('Calling David Chen...', 'info')">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
-                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                </svg>
-                Call
-              </button>
-            </div>
+          <div class="empty-state" id="emptyState" style="display: none;">
+            <div class="empty-state-icon">🔍</div>
+            <h3>Order Not Found</h3>
+            <p>We couldn't find an order with that ID. Please check the order number and try again.</p>
+            <a href="orders.html" class="btn btn-secondary">View My Orders</a>
+          </div>
+        </div>
+
+        <div class="recent-orders">
+          <h3>Recent Orders</h3>
+          <div class="recent-orders-list" id="recentOrdersList">
+            <!-- Recent orders will be loaded here -->
           </div>
         </div>
       </div>
-
-      <div class="tracking-actions">
-        <button class="tracking-btn tracking-btn-secondary" onclick="showToast('Cancellation request submitted', 'info')">Cancel Order</button>
-        <button class="tracking-btn tracking-btn-primary" onclick="location.href='messages.html?chat=2'">Contact Artisan</button>
-      </div>
-    </div>
-  </div>
     </main>
   </div>
 
   <script src="../js/main.js"></script>
   <script src="../js/dashboard.js"></script>
-  <script src="../js/tracking.js"></script>
-  <script>
-    // tracking.js expects #trackingTimeline; it will populate it.
-  </script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
-      const nameEl = document.getElementById('sidebarUserName');
-      if (user && nameEl) nameEl.textContent = `${user.firstName || 'User'} ${user.lastName || ''}`.trim();
-    });
-  </script>
+  <script src="../js/maps-config.js"></script>
+  <script src="../js/google-maps.js"></script>
+  <script src="../js/track-order.js"></script>
 </body>
 </html>
