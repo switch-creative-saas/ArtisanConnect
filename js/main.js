@@ -316,7 +316,9 @@ function getAppBasePath() {
 }
 
 function getApiBaseUrl() {
-  return `${getAppBasePath()}/backend/api`;
+  // Build API path relative to the current page so it works in local, subfolder,
+  // and hosted preview/proxy environments.
+  return `${getSiteRootPrefix()}backend/api`;
 }
 
 function ensureAuthModal() {
