@@ -2,10 +2,24 @@
 // `db.php` lives one level up (backend/db.php)
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/response.php';
+require_once __DIR__ . '/cors.php';
+
+apply_cors_headers();
 
 function session_start_if_needed(): void {
   if (session_status() === PHP_SESSION_NONE) {
     // Cookie-based auth: let browser manage session cookies.
+    $isHttps =
+      (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ||
+      (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+
+    session_set_cookie_params([
+      'lifetime' => 0,
+      'path' => '/',
+      'secure' => $isHttps,
+      'httponly' => true,
+      'samesite' => $isHttps ? 'None' : 'Lax'
+    ]);
     session_start();
   }
 }

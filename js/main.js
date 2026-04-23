@@ -360,6 +360,19 @@ function getAppBasePath() {
 }
 
 function getApiBaseUrl() {
+  const globalOverride = typeof window !== 'undefined' ? window.ARTISAN_API_BASE_URL : '';
+  if (typeof globalOverride === 'string' && globalOverride.trim()) {
+    return globalOverride.replace(/\/+$/, '');
+  }
+
+  const metaOverride = typeof document !== 'undefined'
+    ? document.querySelector('meta[name="artisan-api-base"]')
+    : null;
+  const metaValue = metaOverride?.getAttribute('content') || '';
+  if (metaValue.trim()) {
+    return metaValue.trim().replace(/\/+$/, '');
+  }
+
   // Build API path relative to the current page so it works in local, subfolder,
   // and hosted preview/proxy environments.
   return `${getSiteRootPrefix()}backend/api`;
