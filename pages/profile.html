@@ -148,16 +148,19 @@
       const removeBtn = document.getElementById('removeAvatarBtn');
       const form = document.getElementById('profileForm');
 
-      const defaultAvatar = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&h=120&fit=crop';
-      let pendingAvatar = user.avatar || defaultAvatar;
+      const defaultAvatar = typeof getUserInitialAvatar === 'function'
+        ? getUserInitialAvatar(user)
+        : 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&h=120&fit=crop';
+      let pendingAvatar = user.avatar || '';
 
       function setAvatar(src) {
-        pendingAvatar = src || defaultAvatar;
-        if (preview) preview.src = pendingAvatar;
-        if (av) av.src = pendingAvatar;
+        pendingAvatar = src || '';
+        const displayAvatar = pendingAvatar || defaultAvatar;
+        if (preview) preview.src = displayAvatar;
+        if (av) av.src = displayAvatar;
       }
 
-      setAvatar(user.avatar || defaultAvatar);
+      setAvatar(user.avatar || '');
       if (urlInput) urlInput.value = user.avatar || '';
 
       urlInput?.addEventListener('input', () => {
@@ -181,7 +184,7 @@
       removeBtn?.addEventListener('click', () => {
         if (urlInput) urlInput.value = '';
         if (fileInput) fileInput.value = '';
-        setAvatar(defaultAvatar);
+        setAvatar('');
       });
 
       document.getElementById('profileFirstName').value = user.firstName || '';
@@ -195,7 +198,7 @@
           lastName: document.getElementById('profileLastName')?.value?.trim() || user.lastName,
           email: document.getElementById('profileEmail')?.value?.trim() || user.email,
           phone: document.getElementById('profilePhone')?.value?.trim() || user.phone,
-          avatar: pendingAvatar
+          avatar: pendingAvatar || null
         };
         try {
           localStorage.setItem('user', JSON.stringify(updated));

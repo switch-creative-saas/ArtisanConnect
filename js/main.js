@@ -269,6 +269,50 @@ function normalizeBackendUserForFrontend(user) {
   };
 }
 
+function getUserDisplayName(user) {
+  if (!user) return 'User';
+  const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+  if (fullName) return fullName;
+  if (user.name) return String(user.name).trim();
+  if (user.email) return String(user.email).trim();
+  return 'User';
+}
+
+function getUserInitials(user) {
+  const name = getUserDisplayName(user);
+  const tokens = name.split(/\s+/).filter(Boolean);
+  if (!tokens.length) return 'U';
+  if (tokens.length === 1) return tokens[0].slice(0, 1).toUpperCase();
+  return `${tokens[0].slice(0, 1)}${tokens[1].slice(0, 1)}`.toUpperCase();
+}
+
+function getUserInitialAvatar(user) {
+  const initials = getUserInitials(user);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#3b82f6"/></linearGradient></defs><rect width="160" height="160" rx="80" fill="url(#g)"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="56" font-weight="700">${initials}</text></svg>`;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
+function getUserAvatarSrc(user) {
+  const avatar = String(user?.avatar || user?.avatar_url || '').trim();
+  if (avatar) return avatar;
+  return getUserInitialAvatar(user);
+}
+
+function applyUserAvatarImage(imgEl, user) {
+  if (!imgEl || !user) return;
+  imgEl.src = getUserAvatarSrc(user);
+  imgEl.alt = getUserDisplayName(user);
+}
+
+function applyCurrentUserAvatars() {
+  const user = getCurrentUser();
+  if (!user) return;
+  const avatarSelectors = ['.sidebar-user-avatar', '#sidebarAvatar', '#profileAvatarPreview'];
+  avatarSelectors.forEach((selector) => {
+    document.querySelectorAll(selector).forEach((img) => applyUserAvatarImage(img, user));
+  });
+}
+
 async function initAuthFromBackend() {
   // Hydrate local `user` from the backend session cookie.
   const meUrl = `${getApiBaseUrl()}/auth/me.php`;
@@ -813,5 +857,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initRippleEffect();
     updateNavForAuth();
     initHireGuards();
+    applyCurrentUserAvatars();
   });
 });
