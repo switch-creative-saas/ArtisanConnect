@@ -1,8 +1,11 @@
 <?php
+require_once __DIR__ . '/../../lib/cors.php';
+require_once __DIR__ . '/../../lib/session.php';
 require_once __DIR__ . '/../../lib/auth.php';
 require_once __DIR__ . '/../../lib/input.php';
 
-session_start_if_needed();
+apply_cors_headers();
+start_secure_session();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
   json_error('Method Not Allowed', 405);

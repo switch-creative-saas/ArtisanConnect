@@ -6,6 +6,9 @@ function allowed_cors_origins(): array {
   $raw = getenv('CORS_ALLOW_ORIGINS') ?: '';
   $list = array_values(array_filter(array_map('trim', explode(',', $raw))));
 
+  // Production frontend URL
+  $list[] = 'https://artisan-connect-ten.vercel.app';
+
   // Local dev defaults.
   $list[] = 'http://127.0.0.1:8000';
   $list[] = 'http://127.0.0.1:8001';
@@ -32,14 +35,18 @@ function apply_cors_headers(): void {
   $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
   $allowed = allowed_cors_origins();
 
+  // Allow specific origins or allow all for testing
   if ($origin !== '' && origin_is_allowed($origin, $allowed)) {
     header("Access-Control-Allow-Origin: $origin");
     header('Vary: Origin');
     header('Access-Control-Allow-Credentials: true');
+  } else {
+    // For testing, allow all origins (remove this in production)
+    header("Access-Control-Allow-Origin: *");
   }
 
   header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
-  header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+  header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 
   if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
     http_response_code(204);

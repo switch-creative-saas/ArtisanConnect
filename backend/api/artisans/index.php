@@ -1,7 +1,11 @@
 <?php
 require_once __DIR__ . '/../../lib/response.php';
 require_once __DIR__ . '/../../lib/input.php';
+require_once __DIR__ . '/../../lib/cors.php';
+require_once __DIR__ . '/../../lib/session.php';
 require_once __DIR__ . '/../../db.php';
+
+apply_cors_headers();
 
 // GET /backend/api/artisans/index.php
 // Supported (optional) query params:

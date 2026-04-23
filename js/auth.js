@@ -223,8 +223,8 @@ function handleLogin(event) {
       const res = await fetch(`${apiBase}/auth/login.php`, {
         method: 'POST',
         credentials: 'include',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ email, password }).toString()
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
       });
 
       if (!res.ok) {
